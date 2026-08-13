@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<!-- saved from url=(0045)file:///C:/Users/jinoh/Downloads/index_1.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>82Bowl Recipes</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600&display=swap');
+
+  :root {
+    --black: #111111;
+    --white: #F7F5F0;
+    --red: #C8352A;
+    --gray: #888888;
+    --light: #E8E5DF;
+    --card: #FFFFFF;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--white);
+    color: var(--black);
+    font-family: 'IBM Plex Sans', sans-serif;
+    min-height: 100vh;
+  }
+
+  header {
+    background: var(--black);
+    color: var(--white);
+    padding: 20px 24px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  header h1 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+  }
+
+  header p {
+    font-size: 11px;
+    color: var(--gray);
+    margin-top: 2px;
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 0.05em;
+  }
+
+  .tabs {
+    display: flex;
+    overflow-x: auto;
+    background: var(--black);
+    padding: 0 24px;
+    gap: 0;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+
+  .tab {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    padding: 10px 16px;
+    border: none;
+    background: transparent;
+    color: var(--gray);
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+  }
+
+  .tab.active {
+    color: var(--white);
+    border-bottom: 2px solid var(--red);
+  }
+
+  .content {
+    padding: 24px 20px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .recipe { display: none; }
+  .recipe.active { display: block; }
+
+  .recipe-header {
+    margin-bottom: 20px;
+  }
+
+  .recipe-header h2 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .recipe-header .badge {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--red);
+    border: 1px solid var(--red);
+    padding: 2px 8px;
+    margin-top: 6px;
+  }
+
+  .input-block {
+    background: var(--black);
+    color: var(--white);
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .input-block label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--gray);
+  }
+
+  .input-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .input-block input {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--red);
+    color: var(--white);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 28px;
+    font-weight: 600;
+    width: 80px;
+    text-align: right;
+    outline: none;
+    padding: 2px 0;
+  }
+
+  .input-block .unit {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    color: var(--gray);
+  }
+
+  .section-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: var(--gray);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--light);
+  }
+
+  .ingredient-list {
+    margin-bottom: 24px;
+  }
+
+  .ingredient {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--light);
+  }
+
+  .ingredient:last-child { border-bottom: none; }
+
+  .ing-name {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--black);
+  }
+
+  .ing-amount {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--black);
+    white-space: nowrap;
+    margin-left: 12px;
+  }
+
+  .ing-amount .unit-label {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--gray);
+    margin-left: 3px;
+  }
+
+  .highlight {
+    background: var(--black);
+    color: var(--white);
+    padding: 12px 16px;
+    margin-bottom: 2px;
+  }
+
+  .highlight .ing-name { color: var(--white); font-weight: 600; }
+  .highlight .ing-amount { color: var(--white); }
+
+  .cooking-notes {
+    background: var(--light);
+    padding: 16px 20px;
+    margin-top: 8px;
+  }
+
+  .cooking-notes .note-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: var(--gray);
+    margin-bottom: 10px;
+  }
+
+  .cooking-notes ol {
+    padding-left: 18px;
+  }
+
+  .cooking-notes li {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--black);
+    margin-bottom: 4px;
+  }
+
+  .reset-btn {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--gray);
+    background: none;
+    border: 1px solid var(--light);
+    padding: 6px 14px;
+    cursor: pointer;
+    margin-top: 20px;
+  }
+
+  .reset-btn:active { background: var(--light); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>82BOWL</h1>
+  <p>RECIPE CALCULATOR</p>
+</header>
+
+<div class="tabs">
+  <button class="tab" onclick="showRecipe(&#39;spicy-chicken&#39;, this)">SPICY CHICKEN</button>
+  <button class="tab active" onclick="showRecipe(&#39;bulgogi&#39;, this)">BULGOGI</button>
+  <button class="tab" onclick="showRecipe(&#39;pork-galbi&#39;, this)">PORK GALBI</button>
+  <button class="tab" onclick="showRecipe(&#39;spare-rib&#39;, this)">SPARE RIB</button>
+  <button class="tab" onclick="showRecipe(&#39;spicy-tofu&#39;, this)">SPICY TOFU</button>
+</div>
+
+<div class="content">
+
+  <!-- SPICY CHICKEN -->
+  <div class="recipe" id="spicy-chicken">
+    <div class="recipe-header">
+      <h2>Spicy Chicken</h2>
+      <span class="badge">CHICKEN THIGH</span>
+    </div>
+    <div class="input-block">
+      <label>MEAT WEIGHT</label>
+      <div class="input-row">
+        <input type="number" id="sc-lb" value="10" min="0.1" step="0.5" oninput="calcSC()">
+        <span class="unit">lb</span>
+      </div>
+    </div>
+
+    <div class="ingredient-list">
+      <div class="section-label">Day 1 — 1차 마리네이드</div>
+      <div class="ingredient highlight">
+        <span class="ing-name">Chicken Thigh</span>
+        <span class="ing-amount"><span id="sc-chicken">10.0</span><span class="unit-label">lb</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Mirin</span>
+        <span class="ing-amount"><span id="sc-mirin1">135</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Sugar</span>
+        <span class="ing-amount"><span id="sc-sugar1">45</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Ginger</span>
+        <span class="ing-amount"><span id="sc-ginger">22.5</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">MSG</span>
+        <span class="ing-amount"><span id="sc-msg1">9</span><span class="unit-label">g</span></span>
+      </div>
+    </div>
+
+    <div class="ingredient-list">
+      <div class="section-label">Day 2 — 소스 마리네이드</div>
+      <div class="ingredient">
+        <span class="ing-name">Soy Sauce Jin Gold</span>
+        <span class="ing-amount"><span id="sc-soy">130.9</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Mirin</span>
+        <span class="ing-amount"><span id="sc-mirin2">93.2</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Cooking Sake</span>
+        <span class="ing-amount"><span id="sc-sake">37.9</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Corn Syrup</span>
+        <span class="ing-amount"><span id="sc-corn">37.9</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Black Pepper</span>
+        <span class="ing-amount"><span id="sc-pepper">1.3</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Gochujang</span>
+        <span class="ing-amount"><span id="sc-gochujang">419.8</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Gochugaru Kimchi</span>
+        <span class="ing-amount"><span id="sc-gochugaru-k">62.1</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Gochugaru Fine</span>
+        <span class="ing-amount"><span id="sc-gochugaru-f">62.1</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Oyster Sauce</span>
+        <span class="ing-amount"><span id="sc-oyster">168.8</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Sugar</span>
+        <span class="ing-amount"><span id="sc-sugar2">168.8</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">MSG</span>
+        <span class="ing-amount"><span id="sc-msg2">18.8</span><span class="unit-label">g</span></span>
+      </div>
+    </div>
+    <button class="reset-btn" onclick="resetLb(&#39;sc-lb&#39;, calcSC)">RESET TO 10 LB</button>
+  </div>
+
+  <!-- BULGOGI -->
+  <div class="recipe active" id="bulgogi">
+    <div class="recipe-header">
+      <h2>Beef Ribeye Bulgogi</h2>
+      <span class="badge">BEEF RIB EYE</span>
+    </div>
+    <div class="input-block">
+      <label>MEAT WEIGHT</label>
+      <div class="input-row">
+        <input type="number" id="bg-lb" value="10" min="0.1" step="0.5" oninput="calcBG()">
+        <span class="unit">lb</span>
+      </div>
+    </div>
+
+    <div class="ingredient-list">
+      <div class="section-label">마리네이드</div>
+      <div class="ingredient highlight">
+        <span class="ing-name">Beef Rib Eye</span>
+        <span class="ing-amount"><span id="bg-beef">10.0</span><span class="unit-label">lb</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Base Sauce</span>
+        <span class="ing-amount"><span id="bg-base">1300</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Onion</span>
+        <span class="ing-amount"><span id="bg-onion1">270</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Garlic</span>
+        <span class="ing-amount"><span id="bg-garlic">90</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Ginger</span>
+        <span class="ing-amount"><span id="bg-ginger">24</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Canola Oil</span>
+        <span class="ing-amount"><span id="bg-canola">132</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Sesame Oil</span>
+        <span class="ing-amount"><span id="bg-sesame-oil">132</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Brown Sugar</span>
+        <span class="ing-amount"><span id="bg-brown-sugar">160</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Salt</span>
+        <span class="ing-amount"><span id="bg-salt">42</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Black Pepper</span>
+        <span class="ing-amount"><span id="bg-pepper">18</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">MSG</span>
+        <span class="ing-amount"><span id="bg-msg">15</span><span class="unit-label">g</span></span>
+      </div>
+    </div>
+
+    <div class="ingredient-list">
+      <div class="section-label">서비스</div>
+      <div class="ingredient">
+        <span class="ing-name">Onion</span>
+        <span class="ing-amount"><span id="bg-onion2">750</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Green Pepper</span>
+        <span class="ing-amount"><span id="bg-green-pepper">300</span><span class="unit-label">g</span></span>
+      </div>
+    </div>
+    <button class="reset-btn" onclick="resetLb(&#39;bg-lb&#39;, calcBG)">RESET TO 10 LB</button>
+  </div>
+
+  <!-- PORK GALBI -->
+  <div class="recipe" id="pork-galbi">
+    <div class="recipe-header">
+      <h2>Pork Galbi</h2>
+      <span class="badge">PORK SHOULDER</span>
+    </div>
+    <div class="input-block">
+      <label>MEAT WEIGHT</label>
+      <div class="input-row">
+        <input type="number" id="pg-lb" value="10" min="0.1" step="0.5" oninput="calcPG()">
+        <span class="unit">lb</span>
+      </div>
+    </div>
+
+    <div class="ingredient-list">
+      <div class="section-label">마리네이드</div>
+      <div class="ingredient highlight">
+        <span class="ing-name">Pork Shoulder</span>
+        <span class="ing-amount"><span id="pg-pork">10.0</span><span class="unit-label">lb</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Yukjang</span>
+        <span class="ing-amount"><span id="pg-yukjang">1134</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Water</span>
+        <span class="ing-amount"><span id="pg-water">907</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Garlic, Mince</span>
+        <span class="ing-amount"><span id="pg-garlic">91</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Black Pepper</span>
+        <span class="ing-amount"><span id="pg-pepper">2</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">MSG</span>
+        <span class="ing-amount"><span id="pg-msg">5</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Caramel</span>
+        <span class="ing-amount"><span id="pg-caramel">9</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Sesame Seeds</span>
+        <span class="ing-amount"><span id="pg-sesame-seeds">23</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Sesame Oil</span>
+        <span class="ing-amount"><span id="pg-sesame-oil">91</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Pineapple</span>
+        <span class="ing-amount"><span id="pg-pineapple">227</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Coke</span>
+        <span class="ing-amount"><span id="pg-coke">136</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Sugar</span>
+        <span class="ing-amount"><span id="pg-sugar">91</span><span class="unit-label">g</span></span>
+      </div>
+    </div>
+    <button class="reset-btn" onclick="resetLb(&#39;pg-lb&#39;, calcPG)">RESET TO 10 LB</button>
+  </div>
+
+  <!-- SPARE RIB -->
+  <div class="recipe" id="spare-rib">
+    <div class="recipe-header">
+      <h2>Spicy Spare Rib</h2>
+      <span class="badge">ST. LOUIS CUT</span>
+    </div>
+    <div class="input-block">
+      <label>RIB WEIGHT</label>
+      <div class="input-row">
+        <input type="number" id="sr-lb" value="10" min="0.1" step="0.5" oninput="calcSR()">
+        <span class="unit">lb</span>
+      </div>
+    </div>
+
+    <div class="ingredient-list">
+      <div class="section-label">재료</div>
+      <div class="ingredient highlight">
+        <span class="ing-name">Spare Rib</span>
+        <span class="ing-amount"><span id="sr-rib">10.0</span><span class="unit-label">lb</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Spicy Pork Sauce</span>
+        <span class="ing-amount"><span id="sr-sauce">1333</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Water</span>
+        <span class="ing-amount"><span id="sr-water">1333</span><span class="unit-label">g</span></span>
+      </div>
+    </div>
+
+    <div class="cooking-notes">
+      <div class="note-title">조리 메모</div>
+      <ol>
+        <li>Hotel pan 한 장당 max 7.5 lb</li>
+        <li>266°F / 100% Steam / No lid</li>
+        <li>35분 조리 → 뒤집고 35분 추가</li>
+      </ol>
+    </div>
+    <button class="reset-btn" onclick="resetLb(&#39;sr-lb&#39;, calcSR)">RESET TO 10 LB</button>
+  </div>
+
+  <!-- SPICY TOFU -->
+  <div class="recipe" id="spicy-tofu">
+    <div class="recipe-header">
+      <h2>Spicy Tofu</h2>
+      <span class="badge">SUPER FIRM TOFU</span>
+    </div>
+    <div class="input-block">
+      <label>TOFU WEIGHT</label>
+      <div class="input-row">
+        <input type="number" id="st-lb" value="16" min="0.1" step="0.5" oninput="calcST()">
+        <span class="unit">lb</span>
+      </div>
+    </div>
+
+    <div class="ingredient-list">
+      <div class="section-label">재료</div>
+      <div class="ingredient highlight">
+        <span class="ing-name">Super Firm Tofu</span>
+        <span class="ing-amount"><span id="st-tofu">16.0</span><span class="unit-label">lb</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Spicy Pork Sauce</span>
+        <span class="ing-amount"><span id="st-sauce">1000</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Beet Juice</span>
+        <span class="ing-amount"><span id="st-beet">700</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Garlic Mayo</span>
+        <span class="ing-amount"><span id="st-mayo">500</span><span class="unit-label">g</span></span>
+      </div>
+      <div class="ingredient">
+        <span class="ing-name">Corn Powder</span>
+        <span class="ing-amount"><span id="st-corn">100</span><span class="unit-label">g</span></span>
+      </div>
+    </div>
+    <button class="reset-btn" onclick="resetLb(&#39;st-lb&#39;, calcST)">RESET TO 16 LB</button>
+  </div>
+
+</div>
+
+<script>
+  function fmt(val) {
+    return val % 1 === 0 ? val.toFixed(0) : val.toFixed(1);
+  }
+
+  function scale(base, ratio) { return fmt(base * ratio); }
+
+  function showRecipe(id, btn) {
+    document.querySelectorAll('.recipe').forEach(r => r.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  function resetLb(inputId, calcFn) {
+    const defaults = { 'sc-lb': 10, 'bg-lb': 10, 'pg-lb': 10, 'sr-lb': 10, 'st-lb': 16 };
+    document.getElementById(inputId).value = defaults[inputId];
+    calcFn();
+  }
+
+  function calcSC() {
+    const lb = parseFloat(document.getElementById('sc-lb').value) || 10;
+    const r = lb / 10;
+    document.getElementById('sc-chicken').textContent = fmt(lb);
+    document.getElementById('sc-mirin1').textContent = scale(135, r);
+    document.getElementById('sc-sugar1').textContent = scale(45, r);
+    document.getElementById('sc-ginger').textContent = scale(22.5, r);
+    document.getElementById('sc-msg1').textContent = scale(9, r);
+    document.getElementById('sc-soy').textContent = scale(130.9, r);
+    document.getElementById('sc-mirin2').textContent = scale(93.2, r);
+    document.getElementById('sc-sake').textContent = scale(37.9, r);
+    document.getElementById('sc-corn').textContent = scale(37.9, r);
+    document.getElementById('sc-pepper').textContent = scale(1.3, r);
+    document.getElementById('sc-gochujang').textContent = scale(419.8, r);
+    document.getElementById('sc-gochugaru-k').textContent = scale(62.1, r);
+    document.getElementById('sc-gochugaru-f').textContent = scale(62.1, r);
+    document.getElementById('sc-oyster').textContent = scale(168.8, r);
+    document.getElementById('sc-sugar2').textContent = scale(168.8, r);
+    document.getElementById('sc-msg2').textContent = scale(18.8, r);
+  }
+
+  function calcBG() {
+    const lb = parseFloat(document.getElementById('bg-lb').value) || 10;
+    const r = lb / 10;
+    document.getElementById('bg-beef').textContent = fmt(lb);
+    document.getElementById('bg-base').textContent = scale(1300, r);
+    document.getElementById('bg-onion1').textContent = scale(270, r);
+    document.getElementById('bg-garlic').textContent = scale(90, r);
+    document.getElementById('bg-ginger').textContent = scale(24, r);
+    document.getElementById('bg-canola').textContent = scale(132, r);
+    document.getElementById('bg-sesame-oil').textContent = scale(132, r);
+    document.getElementById('bg-brown-sugar').textContent = scale(160, r);
+    document.getElementById('bg-salt').textContent = scale(42, r);
+    document.getElementById('bg-pepper').textContent = scale(18, r);
+    document.getElementById('bg-msg').textContent = scale(15, r);
+    document.getElementById('bg-onion2').textContent = scale(750, r);
+    document.getElementById('bg-green-pepper').textContent = scale(300, r);
+  }
+
+  function calcPG() {
+    const lb = parseFloat(document.getElementById('pg-lb').value) || 10;
+    const r = lb / 10;
+    document.getElementById('pg-pork').textContent = fmt(lb);
+    document.getElementById('pg-yukjang').textContent = scale(1134, r);
+    document.getElementById('pg-water').textContent = scale(907, r);
+    document.getElementById('pg-garlic').textContent = scale(91, r);
+    document.getElementById('pg-pepper').textContent = scale(2, r);
+    document.getElementById('pg-msg').textContent = scale(5, r);
+    document.getElementById('pg-caramel').textContent = scale(9, r);
+    document.getElementById('pg-sesame-seeds').textContent = scale(23, r);
+    document.getElementById('pg-sesame-oil').textContent = scale(91, r);
+    document.getElementById('pg-pineapple').textContent = scale(227, r);
+    document.getElementById('pg-coke').textContent = scale(136, r);
+    document.getElementById('pg-sugar').textContent = scale(91, r);
+  }
+
+  function calcSR() {
+    const lb = parseFloat(document.getElementById('sr-lb').value) || 10;
+    const r = lb / 10;
+    document.getElementById('sr-rib').textContent = fmt(lb);
+    document.getElementById('sr-sauce').textContent = scale(1333, r);
+    document.getElementById('sr-water').textContent = scale(1333, r);
+  }
+
+  function calcST() {
+    const lb = parseFloat(document.getElementById('st-lb').value) || 16;
+    const r = lb / 16;
+    document.getElementById('st-tofu').textContent = fmt(lb);
+    document.getElementById('st-sauce').textContent = scale(1000, r);
+    document.getElementById('st-beet').textContent = scale(700, r);
+    document.getElementById('st-mayo').textContent = scale(500, r);
+    document.getElementById('st-corn').textContent = scale(100, r);
+  }
+</script>
+
+
+</body></html>
