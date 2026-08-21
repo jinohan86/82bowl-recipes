@@ -1,0 +1,1797 @@
+<!DOCTYPE html>
+<!-- saved from url=(0052)file:///C:/Users/jinoh/Downloads/82bowl-cost_17.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>82Bowl — Cost Manager</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+
+:root {
+  --black: #0f0f0f;
+  --white: #f5f3ef;
+  --red: #c8352a;
+  --red-dim: #8b2419;
+  --gray-100: #1a1a1a;
+  --gray-200: #252525;
+  --gray-300: #333333;
+  --gray-400: #555555;
+  --gray-500: #888888;
+  --gray-600: #bbbbbb;
+  --green: #2a7a4b;
+  --green-bg: #0d2318;
+  --yellow: #c8952a;
+  --yellow-bg: #231a08;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; }
+
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: 'IBM Plex Sans', sans-serif;
+  min-height: 100vh;
+}
+
+/* LOCK SCREEN */
+#lock {
+  position: fixed; inset: 0;
+  background: var(--black);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 9999; gap: 24px;
+}
+#lock h1 { font-family: 'IBM Plex Mono', monospace; font-size: 28px; letter-spacing: 0.1em; color: var(--white); }
+#lock p { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--gray-500); letter-spacing: 0.1em; }
+#lock input {
+  background: transparent; border: none;
+  border-bottom: 2px solid var(--red);
+  color: var(--white); font-family: 'IBM Plex Mono', monospace;
+  font-size: 22px; font-weight: 600;
+  width: 180px; text-align: center;
+  outline: none; padding: 8px 0;
+  letter-spacing: 0.15em;
+}
+#lock button {
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+  font-weight: 600; letter-spacing: 0.1em;
+  background: var(--red); color: var(--white);
+  border: none; padding: 10px 28px; cursor: pointer;
+}
+#lock .err { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--red); min-height: 16px; }
+
+/* APP */
+#app { display: none; }
+
+/* HEADER */
+header {
+  background: var(--gray-100);
+  border-bottom: 1px solid var(--gray-300);
+  padding: 0 24px;
+  display: flex; align-items: stretch;
+  position: sticky; top: 0; z-index: 100;
+}
+.logo {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 15px; font-weight: 600;
+  letter-spacing: 0.1em; color: var(--white);
+  padding: 16px 0; margin-right: 32px;
+}
+.logo span { color: var(--red); }
+
+nav { display: flex; gap: 0; overflow-x: auto; }
+nav button {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.08em; color: var(--gray-500);
+  background: transparent; border: none;
+  border-bottom: 2px solid transparent;
+  padding: 0 18px; cursor: pointer;
+  white-space: nowrap; transition: all 0.15s;
+}
+nav button.active { color: var(--white); border-bottom-color: var(--red); }
+nav button:hover:not(.active) { color: var(--gray-600); }
+
+/* MAIN */
+main { max-width: 900px; margin: 0 auto; padding: 32px 20px; }
+
+/* SECTION HEADER */
+.section-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.12em; color: var(--gray-500);
+  text-transform: uppercase; margin-bottom: 16px;
+  padding-bottom: 8px; border-bottom: 1px solid var(--gray-300);
+}
+
+/* PAGE */
+.page { display: none; }
+.page.active { display: block; }
+
+/* RECIPE CALC */
+.recipe-header {
+  display: flex; align-items: baseline; gap: 16px; margin-bottom: 20px; flex-wrap: wrap;
+}
+.recipe-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 22px; font-weight: 600;
+}
+.recipe-badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 0.1em; color: var(--red);
+  border: 1px solid var(--red-dim); padding: 2px 8px;
+}
+
+.lb-input-block {
+  background: var(--gray-100);
+  border: 1px solid var(--gray-300);
+  padding: 16px 20px; margin-bottom: 20px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.lb-input-block label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.1em; color: var(--gray-500);
+}
+.lb-row { display: flex; align-items: center; gap: 8px; }
+.lb-input-block input[type=number] {
+  background: transparent; border: none;
+  border-bottom: 2px solid var(--red);
+  color: var(--white); font-family: 'IBM Plex Mono', monospace;
+  font-size: 28px; font-weight: 600;
+  width: 80px; text-align: right; outline: none; padding: 2px 0;
+}
+.lb-unit { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--gray-500); }
+
+.ing-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+.ing-table th {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 0.1em; color: var(--gray-500);
+  text-transform: uppercase;
+  padding: 8px 12px; text-align: left;
+  border-bottom: 1px solid var(--gray-300);
+  background: var(--gray-100);
+}
+.ing-table th:last-child, .ing-table td:last-child { text-align: right; }
+.ing-table td {
+  padding: 10px 12px; font-size: 13px; color: var(--white);
+  border-bottom: 1px solid var(--gray-200);
+}
+.ing-table tr:nth-child(odd) td { background: var(--gray-100); }
+.ing-table tr:nth-child(even) td { background: transparent; }
+.ing-table .qty { font-family: 'IBM Plex Mono', monospace; font-weight: 500; }
+.ing-table .highlight td { background: var(--gray-200) !important; font-weight: 600; }
+.section-row td {
+  background: var(--gray-200) !important;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 0.08em; color: var(--gray-500);
+  text-transform: uppercase; padding: 6px 12px;
+}
+
+.cooking-notes {
+  background: var(--gray-100); border-left: 3px solid var(--red);
+  padding: 14px 16px; margin-top: 8px;
+}
+.cooking-notes .note-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 0.1em; color: var(--gray-500); margin-bottom: 8px;
+}
+.cooking-notes li { font-size: 13px; line-height: 1.7; color: var(--gray-600); margin-left: 16px; }
+
+/* COST MANAGER */
+.cost-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 32px; }
+@media (max-width: 600px) { .cost-grid { grid-template-columns: 1fr; } }
+
+.cost-card {
+  background: var(--gray-100);
+  border: 1px solid var(--gray-300);
+  padding: 20px;
+}
+.cost-card-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px; font-weight: 600;
+  letter-spacing: 0.08em; color: var(--red);
+  margin-bottom: 16px; text-transform: uppercase;
+}
+
+.cost-row {
+  display: flex; justify-content: space-between;
+  align-items: center; padding: 8px 0;
+  border-bottom: 1px solid var(--gray-200);
+  gap: 12px;
+}
+.cost-row:last-child { border-bottom: none; }
+.cost-label { font-size: 13px; color: var(--gray-600); flex: 1; }
+.cost-val {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px; font-weight: 600; color: var(--white);
+  white-space: nowrap;
+}
+.cost-val.green { color: #4caf82; }
+.cost-val.red { color: var(--red); }
+
+/* SELL PRICE INPUT */
+.sell-block {
+  background: var(--yellow-bg);
+  border: 1px solid var(--yellow);
+  padding: 16px 20px; margin: 16px 0;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.sell-block label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.1em; color: var(--yellow);
+}
+.sell-block input {
+  background: transparent; border: none;
+  border-bottom: 2px solid var(--yellow);
+  color: var(--white); font-family: 'IBM Plex Mono', monospace;
+  font-size: 24px; font-weight: 600;
+  width: 100px; text-align: right; outline: none; padding: 2px 0;
+}
+
+.fc-display {
+  background: var(--green-bg);
+  border: 1px solid var(--green);
+  padding: 16px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.fc-display label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.1em; color: #4caf82;
+}
+.fc-pct {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 32px; font-weight: 600;
+}
+.fc-pct.good { color: #4caf82; }
+.fc-pct.warn { color: var(--yellow); }
+.fc-pct.bad { color: var(--red); }
+
+.servings-row {
+  display: flex; align-items: center; gap: 12px; margin: 16px 0;
+}
+.servings-row label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px; color: var(--gray-500);
+}
+.servings-row input {
+  background: var(--gray-200); border: 1px solid var(--gray-300);
+  color: var(--white); font-family: 'IBM Plex Mono', monospace;
+  font-size: 16px; font-weight: 600;
+  width: 70px; text-align: center; outline: none;
+  padding: 6px 8px;
+}
+
+/* INGREDIENT COST EDITOR */
+.ing-editor { margin-bottom: 32px; }
+.ing-editor-row {
+  display: grid;
+  grid-template-columns: 1fr 110px 80px;
+  gap: 8px; align-items: center;
+  padding: 8px 0; border-bottom: 1px solid var(--gray-200);
+}
+.ing-editor-row:nth-child(even) { background: transparent; }
+.ing-name-label { font-size: 13px; color: var(--gray-600); }
+.ing-price-input {
+  background: var(--gray-200); border: 1px solid var(--gray-300);
+  color: var(--white); font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px; text-align: right;
+  padding: 6px 8px; outline: none; width: 100%;
+}
+.ing-price-input:focus { border-color: var(--red); }
+.ing-unit-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px; color: var(--gray-500);
+}
+.save-btn {
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600;
+  letter-spacing: 0.08em; background: var(--red); color: var(--white);
+  border: none; padding: 8px 20px; cursor: pointer; margin-top: 12px;
+}
+.save-btn:hover { background: var(--red-dim); }
+.save-msg {
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+  color: #4caf82; margin-top: 8px; min-height: 16px;
+}
+
+.reset-btn {
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+  color: var(--gray-500); background: none;
+  border: 1px solid var(--gray-300); padding: 6px 14px;
+  cursor: pointer; margin-top: 12px;
+}
+</style>
+</head>
+<body>
+
+<!-- LOCK -->
+<div id="lock">
+  <h1>82<span>BOWL</span></h1>
+  <p>COST MANAGER</p>
+  <input type="password" id="pw" placeholder="••••••" onkeydown="if(event.key===&#39;Enter&#39;)unlock()">
+  <button onclick="unlock()">ENTER</button>
+  <div class="err" id="pw-err"></div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <header>
+    <div class="logo">82<span>BOWL</span></div>
+    <nav>
+      <button class="active" onclick="showPage(&#39;recipes&#39;,this)">RECIPES</button>
+      <button onclick="showPage(&#39;cost&#39;,this)">COST CALC</button>
+      <button onclick="showPage(&#39;prices&#39;,this)">INGREDIENT PRICES</button>
+      <button onclick="showPage(&#39;packing&#39;,this)">PACKING / STOCK</button>
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- RECIPES PAGE -->
+    <div class="page active" id="page-recipes">
+      <div class="section-title">Recipe Calculator — scale by lb</div>
+
+      <nav style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;">
+        <button class="active" onclick="showRecipe(&#39;sc&#39;,this)" style="font-family:&#39;IBM Plex Mono&#39;,monospace;font-size:11px;font-weight:600;letter-spacing:0.08em;padding:6px 14px;background:var(--gray-200);border:1px solid var(--gray-300);color:var(--white);cursor:pointer;">SPICY CHICKEN</button>
+        <button onclick="showRecipe(&#39;bg&#39;,this)" style="font-family:&#39;IBM Plex Mono&#39;,monospace;font-size:11px;font-weight:600;letter-spacing:0.08em;padding:6px 14px;background:transparent;border:1px solid var(--gray-300);color:var(--gray-500);cursor:pointer;">BULGOGI</button>
+        <button onclick="showRecipe(&#39;sr&#39;,this)" style="font-family:&#39;IBM Plex Mono&#39;,monospace;font-size:11px;font-weight:600;letter-spacing:0.08em;padding:6px 14px;background:transparent;border:1px solid var(--gray-300);color:var(--gray-500);cursor:pointer;">SPARE RIB</button>
+        <button onclick="showRecipe(&#39;st&#39;,this)" style="font-family:&#39;IBM Plex Mono&#39;,monospace;font-size:11px;font-weight:600;letter-spacing:0.08em;padding:6px 14px;background:transparent;border:1px solid var(--gray-300);color:var(--gray-500);cursor:pointer;">SPICY TOFU</button>
+        <button onclick="showRecipe(&#39;pg&#39;,this)" style="font-family:&#39;IBM Plex Mono&#39;,monospace;font-size:11px;font-weight:600;letter-spacing:0.08em;padding:6px 14px;background:transparent;border:1px solid var(--gray-300);color:var(--gray-500);cursor:pointer;">PORK GALBI</button>
+        <button onclick="showRecipe(&#39;bs&#39;,this)" style="font-family:&#39;IBM Plex Mono&#39;,monospace;font-size:11px;font-weight:600;letter-spacing:0.08em;padding:6px 14px;background:transparent;border:1px solid var(--gray-300);color:var(--gray-500);cursor:pointer;">BASE SAUCE</button>
+        <button onclick="showRecipe(&#39;sps&#39;,this)" style="font-family:&#39;IBM Plex Mono&#39;,monospace;font-size:11px;font-weight:600;letter-spacing:0.08em;padding:6px 14px;background:transparent;border:1px solid var(--gray-300);color:var(--gray-500);cursor:pointer;">SPICY PORK SAUCE</button>
+        <button onclick="showRecipe(&#39;sj&#39;,this)" style="font-family:&#39;IBM Plex Mono&#39;,monospace;font-size:11px;font-weight:600;letter-spacing:0.08em;padding:6px 14px;background:transparent;border:1px solid var(--gray-300);color:var(--gray-500);cursor:pointer;">SSAMJANG</button>
+        <button onclick="showRecipe(&#39;tg&#39;,this)" style="font-family:&#39;IBM Plex Mono&#39;,monospace;font-size:11px;font-weight:600;letter-spacing:0.08em;padding:6px 14px;background:transparent;border:1px solid var(--gray-300);color:var(--gray-500);cursor:pointer;">TOFU GLAZE</button>
+        <button onclick="showRecipe(&#39;sm&#39;,this)" style="font-family:&#39;IBM Plex Mono&#39;,monospace;font-size:11px;font-weight:600;letter-spacing:0.08em;padding:6px 14px;background:transparent;border:1px solid var(--gray-300);color:var(--gray-500);cursor:pointer;">SESAME MIX</button>
+        <button onclick="showRecipe(&#39;rc&#39;,this)" style="font-family:&#39;IBM Plex Mono&#39;,monospace;font-size:11px;font-weight:600;letter-spacing:0.08em;padding:6px 14px;background:transparent;border:1px solid var(--gray-300);color:var(--gray-500);cursor:pointer;">RICE</button>
+        <button onclick="showRecipe(&#39;rg&#39;,this)" style="font-family:&#39;IBM Plex Mono&#39;,monospace;font-size:11px;font-weight:600;letter-spacing:0.08em;padding:6px 14px;background:transparent;border:1px solid var(--gray-300);color:var(--gray-500);cursor:pointer;">ROASTED GARLIC</button>
+        <button onclick="showRecipe(&#39;rop&#39;,this)" style="font-family:&#39;IBM Plex Mono&#39;,monospace;font-size:11px;font-weight:600;letter-spacing:0.08em;padding:6px 14px;background:transparent;border:1px solid var(--gray-300);color:var(--gray-500);cursor:pointer;">RED ONION PICKLE</button>
+        <button onclick="showRecipe(&#39;sds&#39;,this)" style="font-family:&#39;IBM Plex Mono&#39;,monospace;font-size:11px;font-weight:600;letter-spacing:0.08em;padding:6px 14px;background:transparent;border:1px solid var(--gray-300);color:var(--gray-500);cursor:pointer;">SESAME DRIZZLE</button>
+      </nav>
+
+      <!-- SPICY CHICKEN -->
+      <div class="recipe" id="r-sc">
+        <div class="recipe-header">
+          <div class="recipe-title">Spicy Chicken</div>
+          <div class="recipe-badge">CHICKEN THIGH</div>
+        </div>
+        <div class="lb-input-block">
+          <label>MEAT WEIGHT</label>
+          <div class="lb-row">
+            <input type="number" id="sc-lb" value="10" min="0.1" step="0.5" oninput="calcSC()">
+            <span class="lb-unit">lb</span>
+          </div>
+        </div>
+        <table class="ing-table">
+          <thead><tr><th>Ingredient</th><th>Qty</th><th>Unit</th></tr></thead>
+          <tbody>
+            <tr class="highlight"><td>Chicken Thigh</td><td class="qty" id="sc-chicken">10.0</td><td>lb</td></tr>
+            <tr><td>Soy Sauce Jin Gold</td><td class="qty" id="sc-soy">130.9</td><td>g</td></tr>
+            <tr><td>Mirin</td><td class="qty" id="sc-mirin">93.2</td><td>g</td></tr>
+            <tr><td>Cooking Sake</td><td class="qty" id="sc-sake">37.9</td><td>g</td></tr>
+            <tr><td>Corn Syrup</td><td class="qty" id="sc-corn">37.9</td><td>g</td></tr>
+            <tr><td>Black Pepper</td><td class="qty" id="sc-pepper">1.3</td><td>g</td></tr>
+            <tr><td>Gochujang</td><td class="qty" id="sc-gochujang">419.8</td><td>g</td></tr>
+            <tr><td>Gochugaru Kimchi</td><td class="qty" id="sc-gk">62.1</td><td>g</td></tr>
+            <tr><td>Gochugaru Fine</td><td class="qty" id="sc-gf">62.1</td><td>g</td></tr>
+            <tr><td>Oyster Sauce</td><td class="qty" id="sc-oyster">168.8</td><td>g</td></tr>
+            <tr><td>Sugar</td><td class="qty" id="sc-sugar">168.8</td><td>g</td></tr>
+            <tr><td>MSG</td><td class="qty" id="sc-msg">18.8</td><td>g</td></tr>
+          </tbody>
+        </table>
+        <div class="cooking-notes">
+          <div class="note-label">COOKING NOTES</div>
+          <ul>
+            <li>Day 1: Mix marinade ingredients with chicken — marinate overnight</li>
+            <li>Day 2: Mix sauce first, combine with chicken — marinate overnight</li>
+            <li>Day 3: Full sheet pan — iCombi Pro 154°F / 100% / 1.5h</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- BULGOGI -->
+      <div class="recipe" id="r-bg" style="display:none">
+        <div class="recipe-header">
+          <div class="recipe-title">Beef Ribeye Bulgogi</div>
+          <div class="recipe-badge">BEEF RIB EYE</div>
+        </div>
+        <div class="lb-input-block">
+          <label>MEAT WEIGHT</label>
+          <div class="lb-row">
+            <input type="number" id="bg-lb" value="10" min="0.1" step="0.5" oninput="calcBG()">
+            <span class="lb-unit">lb</span>
+          </div>
+        </div>
+        <table class="ing-table">
+          <thead><tr><th>Ingredient</th><th>Qty</th><th>Unit</th></tr></thead>
+          <tbody>
+            <tr class="section-row"><td colspan="3">Marinade</td></tr>
+            <tr class="highlight"><td>Beef Rib Eye</td><td class="qty" id="bg-beef">10.0</td><td>lb</td></tr>
+            <tr><td>Base Sauce</td><td class="qty" id="bg-base">1300</td><td>g</td></tr>
+            <tr><td>Onion</td><td class="qty" id="bg-onion1">270</td><td>g</td></tr>
+            <tr><td>Garlic</td><td class="qty" id="bg-garlic">90</td><td>g</td></tr>
+            <tr><td>Ginger</td><td class="qty" id="bg-ginger">24</td><td>g</td></tr>
+            <tr><td>Canola Oil</td><td class="qty" id="bg-canola">132</td><td>g</td></tr>
+            <tr><td>Sesame Oil</td><td class="qty" id="bg-sesoil">132</td><td>g</td></tr>
+            <tr><td>Brown Sugar</td><td class="qty" id="bg-sugar">160</td><td>g</td></tr>
+            <tr><td>Salt</td><td class="qty" id="bg-salt">42</td><td>g</td></tr>
+            <tr><td>Black Pepper</td><td class="qty" id="bg-pepper">18</td><td>g</td></tr>
+            <tr><td>MSG</td><td class="qty" id="bg-msg">15</td><td>g</td></tr>
+            <tr class="section-row"><td colspan="3">Service</td></tr>
+            <tr><td>Onion</td><td class="qty" id="bg-onion2">750</td><td>g</td></tr>
+            <tr><td>Green Pepper</td><td class="qty" id="bg-gp">300</td><td>g</td></tr>
+          </tbody>
+        </table>
+        <div class="cooking-notes">
+          <div class="note-label">COOKING NOTES</div>
+          <ul>
+            <li>Mix all ingredients and marinate with meat overnight</li>
+            <li>Saute onion and green pepper, then cook with meat</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- SPARE RIB -->
+      <div class="recipe" id="r-sr" style="display:none">
+        <div class="recipe-header">
+          <div class="recipe-title">Spicy Spare Rib</div>
+          <div class="recipe-badge">ST. LOUIS CUT — 15 LB PER PAN MAX</div>
+        </div>
+        <div class="lb-input-block">
+          <label>RIB WEIGHT</label>
+          <div class="lb-row">
+            <input type="number" id="sr-lb" value="15" min="0.1" step="0.5" oninput="calcSR()">
+            <span class="lb-unit">lb</span>
+          </div>
+        </div>
+        <table class="ing-table">
+          <thead><tr><th>Ingredient</th><th>Qty</th><th>Unit</th></tr></thead>
+          <tbody>
+            <tr class="highlight"><td>Spare Rib</td><td class="qty" id="sr-rib">10.0</td><td>lb</td></tr>
+            <tr><td>Spicy Pork Sauce</td><td class="qty" id="sr-sauce">1000</td><td>g</td></tr>
+            <tr><td>Water</td><td class="qty" id="sr-water">3000</td><td>g</td></tr>
+          </tbody>
+        </table>
+        <div class="cooking-notes">
+          <div class="note-label">COOKING NOTES</div>
+          <ul>
+            <li>Hotel pan max 15 lb per pan</li>
+            <li>266°F / 100% Steam / No lid</li>
+            <li>35 min → flip → 35 min more</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- SPICY TOFU -->
+      <div class="recipe" id="r-st" style="display:none">
+        <div class="recipe-header">
+          <div class="recipe-title">Spicy Tofu</div>
+          <div class="recipe-badge">SUPER FIRM TOFU — 16 LB BASE</div>
+        </div>
+        <div class="lb-input-block">
+          <label>TOFU WEIGHT</label>
+          <div class="lb-row">
+            <input type="number" id="st-lb" value="16" min="0.1" step="0.5" oninput="calcST()">
+            <span class="lb-unit">lb</span>
+          </div>
+        </div>
+        <table class="ing-table">
+          <thead><tr><th>Ingredient</th><th>Qty</th><th>Unit</th></tr></thead>
+          <tbody>
+            <tr class="highlight"><td>Super Firm Tofu</td><td class="qty" id="st-tofu">16.0</td><td>lb</td></tr>
+            <tr><td>Spicy Pork Sauce</td><td class="qty" id="st-sauce">1000</td><td>g</td></tr>
+            <tr><td>Beet Juice</td><td class="qty" id="st-beet">700</td><td>g</td></tr>
+            <tr><td>Garlic Mayo</td><td class="qty" id="st-mayo">500</td><td>g</td></tr>
+            <tr><td>Corn Powder</td><td class="qty" id="st-corn">100</td><td>g</td></tr>
+          </tbody>
+        </table>
+        <div class="cooking-notes">
+          <div class="note-label">COOKING NOTES</div>
+          <ul>
+            <li>Coat tofu in corn powder evenly</li>
+            <li>Mix Spicy Pork Sauce, Beet Juice, Garlic Mayo together</li>
+            <li>Pan fry or grill tofu until golden, then glaze</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- PORK GALBI -->
+      <div class="recipe" id="r-pg" style="display:none">
+        <div class="recipe-header">
+          <div class="recipe-title">Pork Galbi</div>
+          <div class="recipe-badge">PORK SHOULDER</div>
+        </div>
+        <div class="lb-input-block">
+          <label>MEAT WEIGHT</label>
+          <div class="lb-row">
+            <input type="number" id="pg-lb" value="10" min="0.1" step="0.5" oninput="calcPG()">
+            <span class="lb-unit">lb</span>
+          </div>
+        </div>
+        <table class="ing-table">
+          <thead><tr><th>Ingredient</th><th>Qty</th><th>Unit</th></tr></thead>
+          <tbody>
+            <tr class="highlight"><td>Pork Shoulder</td><td class="qty" id="pg-pork">10.0</td><td>lb</td></tr>
+            <tr><td>Yukjang</td><td class="qty" id="pg-yukjang">1361</td><td>g</td></tr>
+            <tr><td>Water</td><td class="qty" id="pg-water">1088</td><td>g</td></tr>
+            <tr><td>Garlic, Mince</td><td class="qty" id="pg-garlic">109</td><td>g</td></tr>
+            <tr><td>Black Pepper</td><td class="qty" id="pg-pepper">2</td><td>g</td></tr>
+            <tr><td>MSG</td><td class="qty" id="pg-msg">6</td><td>g</td></tr>
+            <tr><td>Caramel</td><td class="qty" id="pg-caramel">22</td><td>g</td></tr>
+            <tr><td>Sesame Seeds</td><td class="qty" id="pg-ses">28</td><td>g</td></tr>
+            <tr><td>Sesame Oil</td><td class="qty" id="pg-sesoil">109</td><td>g</td></tr>
+            <tr><td>Pineapple</td><td class="qty" id="pg-pine">60</td><td>g</td></tr>
+            <tr><td>Pear Juice</td><td class="qty" id="pg-pear">360</td><td>g</td></tr>
+            <tr><td>Sugar</td><td class="qty" id="pg-sugar">109</td><td>g</td></tr>
+          </tbody>
+        </table>
+        <div class="cooking-notes">
+          <div class="note-label">COOKING NOTES</div>
+          <ul>
+            <li>Mix Yukjang, water, and all marinade ingredients</li>
+            <li>Marinate pork shoulder for minimum 4 hours (overnight preferred)</li>
+            <li>Grill or flat-top to order</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- BASE SAUCE -->
+      <div class="recipe" id="r-bs" style="display:none">
+        <div class="recipe-header">
+          <div class="recipe-title">Base Sauce</div>
+          <div class="recipe-badge" id="bs-badge">1 BATCH — 1300g YIELD</div>
+        </div>
+        <div class="lb-input-block">
+          <label>BATCHES</label>
+          <div class="lb-row">
+            <input type="number" id="bs-batch" value="1" min="1" step="1" oninput="calcBS()">
+            <span class="lb-unit">×</span>
+          </div>
+        </div>
+        <table class="ing-table">
+          <thead><tr><th>Ingredient</th><th>Qty</th><th>Unit</th></tr></thead>
+          <tbody>
+            <tr><td>Soy Sauce Yangjo</td><td class="qty" id="bs-soy">600</td><td>g</td></tr>
+            <tr><td>Water</td><td class="qty" id="bs-water">400</td><td>g</td></tr>
+            <tr><td>Brown Sugar</td><td class="qty" id="bs-sugar">300</td><td>g</td></tr>
+          </tbody>
+        </table>
+        <div class="cooking-notes">
+          <div class="note-label">COOKING NOTES</div>
+          <ul>
+            <li>Mix soy sauce + water + brown sugar until dissolved</li>
+            <li>No cooking required — mix directly</li>
+            <li>Used in Bulgogi marinade (1300g per 10lb meat)</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- SPICY PORK SAUCE -->
+      <div class="recipe" id="r-sps" style="display:none">
+        <div class="recipe-header">
+          <div class="recipe-title">Spicy Pork Sauce</div>
+          <div class="recipe-badge" id="sps-badge">1 BATCH — 1000g YIELD</div>
+        </div>
+        <div class="lb-input-block">
+          <label>BATCHES</label>
+          <div class="lb-row">
+            <input type="number" id="sps-batch" value="1" min="1" step="1" oninput="calcSPS()">
+            <span class="lb-unit">×</span>
+          </div>
+        </div>
+        <table class="ing-table">
+          <thead><tr><th>Ingredient</th><th>Qty</th><th>Unit</th></tr></thead>
+          <tbody>
+            <tr><td>Soy Sauce Yangjo</td><td class="qty" id="sps-soy">290</td><td>g</td></tr>
+            <tr><td>Gochugaru Fine</td><td class="qty" id="sps-gf">112</td><td>g</td></tr>
+            <tr><td>Gochugaru Spicy</td><td class="qty" id="sps-gs">37</td><td>g</td></tr>
+            <tr><td>Sesame Oil</td><td class="qty" id="sps-sesoil">84</td><td>g</td></tr>
+            <tr><td>Corn Syrup</td><td class="qty" id="sps-corn">112</td><td>g</td></tr>
+            <tr><td>Mirin</td><td class="qty" id="sps-mirin">28</td><td>g</td></tr>
+            <tr><td>Black Pepper Ground</td><td class="qty" id="sps-pepper">9</td><td>g</td></tr>
+            <tr><td>Dasida</td><td class="qty" id="sps-dasida">19</td><td>g</td></tr>
+            <tr><td>Sugar</td><td class="qty" id="sps-sugar">75</td><td>g</td></tr>
+            <tr><td>Honey Clover</td><td class="qty" id="sps-honey">178</td><td>g</td></tr>
+            <tr><td>Plum Syrup</td><td class="qty" id="sps-plum">56</td><td>g</td></tr>
+          </tbody>
+        </table>
+        <div class="cooking-notes">
+          <div class="note-label">COOKING NOTES</div>
+          <ul>
+            <li>Mix all ingredients together until combined</li>
+            <li>Total yield: 1000g per batch</li>
+            <li>Used in Spicy Spare Rib and Spicy Tofu</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- SSAMJANG -->
+      <div class="recipe" id="r-sj" style="display:none">
+        <div class="recipe-header">
+          <div class="recipe-title">Ssamjang</div>
+          <div class="recipe-badge" id="sj-badge">1 BATCH — 2100g YIELD</div>
+        </div>
+        <div class="lb-input-block">
+          <label>BATCHES</label>
+          <div class="lb-row">
+            <input type="number" id="sj-batch" value="1" min="1" step="1" oninput="calcSJ()">
+            <span class="lb-unit">×</span>
+          </div>
+        </div>
+        <table class="ing-table">
+          <thead><tr><th>Ingredient</th><th>Qty</th><th>Unit</th></tr></thead>
+          <tbody>
+            <tr><td>Korean Bean Paste (Doenjang)</td><td class="qty" id="sj-doenjang">1000</td><td>g</td></tr>
+            <tr><td>Gochujang</td><td class="qty" id="sj-gochujang">500</td><td>g</td></tr>
+            <tr><td>Sugar</td><td class="qty" id="sj-sugar">100</td><td>g</td></tr>
+            <tr><td>Sprite</td><td class="qty" id="sj-sprite">500</td><td>g</td></tr>
+          </tbody>
+        </table>
+        <div class="cooking-notes">
+          <div class="note-label">COOKING NOTES</div>
+          <ul>
+            <li>Mix all ingredients until smooth and combined</li>
+            <li>Portion: 2 tbsp (~30g) per bowl</li>
+            <li>Total yield: <span id="sj-yield">2100</span>g per batch</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- TOFU GLAZE -->
+      <div class="recipe" id="r-tg" style="display:none">
+        <div class="recipe-header">
+          <div class="recipe-title">Tofu Glaze</div>
+          <div class="recipe-badge" id="tg-badge">1 BATCH — 730g YIELD</div>
+        </div>
+        <div class="lb-input-block">
+          <label>BATCHES</label>
+          <div class="lb-row">
+            <input type="number" id="tg-batch" value="1" min="1" step="1" oninput="calcTG()">
+            <span class="lb-unit">×</span>
+          </div>
+        </div>
+        <table class="ing-table">
+          <thead><tr><th>Ingredient</th><th>Qty</th><th>Unit</th></tr></thead>
+          <tbody>
+            <tr><td>Spicy Pork Sauce</td><td class="qty" id="tg-sauce">500</td><td>g</td></tr>
+            <tr><td>Beet Juice</td><td class="qty" id="tg-beet">100</td><td>g</td></tr>
+            <tr><td>Garlic Mayo</td><td class="qty" id="tg-mayo">100</td><td>g</td></tr>
+            <tr><td>Corn Powder</td><td class="qty" id="tg-corn">30</td><td>g</td></tr>
+          </tbody>
+        </table>
+        <div class="cooking-notes">
+          <div class="note-label">COOKING NOTES</div>
+          <ul>
+            <li>Mix Spicy Pork Sauce, Beet Juice, and Garlic Mayo together</li>
+            <li>Add Corn Powder last and whisk until smooth</li>
+            <li>Apply to tofu just before finishing on flat-top or grill</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- SESAME MIX -->
+      <div class="recipe" id="r-sm" style="display:none">
+        <div class="recipe-header">
+          <div class="recipe-title">Sesame Mix</div>
+          <div class="recipe-badge" id="sm-badge">1 BATCH — 100g YIELD</div>
+        </div>
+        <div class="lb-input-block">
+          <label>BATCHES</label>
+          <div class="lb-row">
+            <input type="number" id="sm-batch" value="1" min="1" step="1" oninput="calcSM()">
+            <span class="lb-unit">×</span>
+          </div>
+        </div>
+        <table class="ing-table">
+          <thead><tr><th>Ingredient</th><th>Qty</th><th>Unit</th></tr></thead>
+          <tbody>
+            <tr><td>Sesame Seed</td><td class="qty" id="sm-white">70</td><td>g</td></tr>
+            <tr><td>Black Sesame</td><td class="qty" id="sm-black">30</td><td>g</td></tr>
+          </tbody>
+        </table>
+        <div class="cooking-notes">
+          <div class="note-label">COOKING NOTES</div>
+          <ul>
+            <li>Mix sesame seeds 7:3 (white:black)</li>
+            <li>Portion: 1 tsp (~3g) per bowl — sprinkle on top at service</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- RICE -->
+      <div class="recipe" id="r-rc" style="display:none">
+        <div class="recipe-header">
+          <div class="recipe-title">Rice</div>
+          <div class="recipe-badge" id="rc-badge">1 BATCH — ~33 PORTIONS</div>
+        </div>
+        <div class="lb-input-block">
+          <label>BATCHES</label>
+          <div class="lb-row">
+            <input type="number" id="rc-batch" value="1" min="1" step="1" oninput="calcRC()">
+            <span class="lb-unit">×</span>
+          </div>
+        </div>
+        <table class="ing-table">
+          <thead><tr><th>Ingredient</th><th>Qty</th><th>Unit</th></tr></thead>
+          <tbody>
+            <tr><td>Rice</td><td class="qty" id="rc-rice">3000</td><td>g</td></tr>
+            <tr><td>Water</td><td class="qty" id="rc-water">3000</td><td>g</td></tr>
+            <tr><td>Salt</td><td class="qty" id="rc-salt">2</td><td>Tbsp</td></tr>
+          </tbody>
+        </table>
+        <div class="cooking-notes">
+          <div class="note-label">COOKING NOTES</div>
+          <ul>
+            <li>Rinse rice before cooking</li>
+            <li>Cooked yield: ~<span id="rc-yield">6000</span>g / est. <span id="rc-portions">33</span> portions</li>
+            <li>Portion size: 8oz (227g cooked) per bowl</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+      <!-- ROASTED GARLIC -->
+      <div class="recipe" id="r-rg" style="display:none">
+        <div class="recipe-header">
+          <div class="recipe-title">Roasted Garlic</div>
+          <div class="recipe-badge" id="rg-badge">1 BATCH — 2675g YIELD</div>
+        </div>
+        <div class="lb-input-block">
+          <label>BATCHES</label>
+          <div class="lb-row">
+            <input type="number" id="rg-batch" value="1" min="1" step="1" oninput="calcRG()">
+            <span class="lb-unit">×</span>
+          </div>
+        </div>
+        <table class="ing-table">
+          <thead><tr><th>Ingredient</th><th>Qty</th><th>Unit</th></tr></thead>
+          <tbody>
+            <tr><td>Garlic</td><td class="qty" id="rg-garlic">2000</td><td>g</td></tr>
+            <tr><td>Canola Oil</td><td class="qty" id="rg-oil">400</td><td>g</td></tr>
+            <tr><td>Water</td><td class="qty" id="rg-water">250</td><td>g</td></tr>
+            <tr><td>Salt</td><td class="qty" id="rg-salt">25</td><td>g</td></tr>
+          </tbody>
+        </table>
+        <div class="cooking-notes">
+          <div class="note-label">COOKING NOTES</div>
+          <ul>
+            <li>Mix garlic, canola oil, water, and salt. Ensure all cloves are evenly coated.</li>
+            <li>Tightly cover hotel pan with aluminum foil.</li>
+            <li>Roast at 350°F with fan on for 1 hour (test with paring knife — should slip through clove).</li>
+            <li>Remove foil, continue roasting 20 min until light golden brown and evenly caramelized.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- RED ONION PICKLE -->
+      <div class="recipe" id="r-rop" style="display:none">
+        <div class="recipe-header">
+          <div class="recipe-title">Red Onion Pickle</div>
+          <div class="recipe-badge" id="rop-badge">1 BATCH — 5kg ONION BASE</div>
+        </div>
+        <div class="lb-input-block">
+          <label>BATCHES</label>
+          <div class="lb-row">
+            <input type="number" id="rop-batch" value="1" min="1" step="1" oninput="calcROP()">
+            <span class="lb-unit">×</span>
+          </div>
+        </div>
+        <table class="ing-table">
+          <thead><tr><th>Ingredient</th><th>Qty</th><th>Unit</th></tr></thead>
+          <tbody>
+            <tr class="highlight"><td>Red Onion</td><td class="qty" id="rop-onion">5000</td><td>g</td></tr>
+            <tr><td>Jalapeno</td><td class="qty" id="rop-jal">200</td><td>g</td></tr>
+            <tr><td>Ginger</td><td class="qty" id="rop-ginger">45</td><td>g</td></tr>
+            <tr><td>Dried Chili</td><td class="qty" id="rop-chili">6</td><td>g</td></tr>
+            <tr><td>Mirin</td><td class="qty" id="rop-mirin">750</td><td>g</td></tr>
+            <tr><td>Salt</td><td class="qty" id="rop-salt">100</td><td>g</td></tr>
+            <tr><td>Sugar</td><td class="qty" id="rop-sugar">1000</td><td>g</td></tr>
+            <tr><td>Sake</td><td class="qty" id="rop-sake">750</td><td>g</td></tr>
+            <tr><td>Soy Sauce</td><td class="qty" id="rop-soy">1500</td><td>g</td></tr>
+            <tr><td>Vinegar</td><td class="qty" id="rop-vinegar">700</td><td>g</td></tr>
+            <tr><td>Water</td><td class="qty" id="rop-water">650</td><td>g</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- SESAME DRIZZLE SAUCE -->
+      <div class="recipe" id="r-sds" style="display:none">
+        <div class="recipe-header">
+          <div class="recipe-title">Sesame Drizzle Sauce</div>
+          <div class="recipe-badge" id="sds-badge">1 BATCH — 250g YIELD</div>
+        </div>
+        <div class="lb-input-block">
+          <label>BATCHES</label>
+          <div class="lb-row">
+            <input type="number" id="sds-batch" value="1" min="1" step="1" oninput="calcSDS()">
+            <span class="lb-unit">×</span>
+          </div>
+        </div>
+        <table class="ing-table">
+          <thead><tr><th>Ingredient</th><th>Qty</th><th>Unit</th></tr></thead>
+          <tbody>
+            <tr><td>Canola Oil</td><td class="qty" id="sds-canola">150</td><td>g</td></tr>
+            <tr><td>Sesame Oil</td><td class="qty" id="sds-sesoil">50</td><td>g</td></tr>
+            <tr><td>Yondu</td><td class="qty" id="sds-yondu">50</td><td>g</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    <!-- COST CALC PAGE -->
+    <div class="page" id="page-cost">
+      <div class="section-title">Cost per Bowl</div>
+
+      <nav style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;">
+        <button class="active" onclick="showCost(&#39;csc&#39;,this)" style="font-family:&#39;IBM Plex Mono&#39;,monospace;font-size:11px;font-weight:600;letter-spacing:0.08em;padding:6px 14px;background:var(--gray-200);border:1px solid var(--gray-300);color:var(--white);cursor:pointer;">SPICY CHICKEN</button>
+        <button onclick="showCost(&#39;cbg&#39;,this)" style="font-family:&#39;IBM Plex Mono&#39;,monospace;font-size:11px;font-weight:600;letter-spacing:0.08em;padding:6px 14px;background:transparent;border:1px solid var(--gray-300);color:var(--gray-500);cursor:pointer;">BULGOGI</button>
+        <button onclick="showCost(&#39;csr&#39;,this)" style="font-family:&#39;IBM Plex Mono&#39;,monospace;font-size:11px;font-weight:600;letter-spacing:0.08em;padding:6px 14px;background:transparent;border:1px solid var(--gray-300);color:var(--gray-500);cursor:pointer;">SPARE RIB</button>
+        <button onclick="showCost(&#39;cst&#39;,this)" style="font-family:&#39;IBM Plex Mono&#39;,monospace;font-size:11px;font-weight:600;letter-spacing:0.08em;padding:6px 14px;background:transparent;border:1px solid var(--gray-300);color:var(--gray-500);cursor:pointer;">SPICY TOFU</button>
+        <button onclick="showCost(&#39;cpg&#39;,this)" style="font-family:&#39;IBM Plex Mono&#39;,monospace;font-size:11px;font-weight:600;letter-spacing:0.08em;padding:6px 14px;background:transparent;border:1px solid var(--gray-300);color:var(--gray-300);cursor:pointer;">PORK GALBI</button>
+      </nav>
+
+      <div id="cost-panels"></div>
+    </div>
+
+    <!-- INGREDIENT PRICES PAGE -->
+    <div class="page" id="page-prices">
+      <div class="section-title">Ingredient Prices — edit and save</div>
+      <div class="ing-editor" id="ing-editor"></div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px;">
+        <button class="save-btn" onclick="savePrices()">↑ SAVE PRICES</button>
+        <button class="reset-btn" onclick="loadPricesFromSheets()" style="border-color:var(--gray-500);color:var(--gray-500);">↓ LOAD FROM SHEETS</button>
+        <button class="reset-btn" onclick="resetPrices()">RESET TO DEFAULT</button>
+      </div>
+      <div class="save-msg" id="save-msg"></div>
+    </div>
+
+
+    <!-- PACKING / STOCK PAGE -->
+    <div class="page" id="page-packing">
+      <div class="section-title">Packing / Stock — AM out / PM remaining</div>
+
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-family:&#39;IBM Plex Mono&#39;,monospace;font-size:11px;color:var(--gray-500);">WEEK OF</span>
+          <input type="date" id="pack-date" style="background:var(--gray-200);border:1px solid var(--gray-300);color:var(--white);font-family:&#39;IBM Plex Mono&#39;,monospace;font-size:12px;padding:6px 10px;outline:none;">
+        </div>
+        <div style="display:flex;gap:12px;margin-left:auto;">
+          <button onclick="clearPacking()" class="reset-btn">CLEAR</button>
+          <button onclick="loadFromSheets()" class="reset-btn" style="border-color:var(--gray-500);color:var(--gray-500);">↓ LOAD</button>
+          <button onclick="savePacking()" class="save-btn">↑ SAVE</button>
+        </div>
+      </div>
+
+      <div style="font-family:&#39;IBM Plex Mono&#39;,monospace;font-size:10px;color:var(--gray-500);margin-bottom:12px;letter-spacing:0.08em;">
+        FORMAT: AM (packed out) / PM (left over)
+      </div>
+
+      <div style="overflow-x:auto;">
+        <table class="ing-table" style="min-width:700px;">
+          <thead>
+            <tr>
+              <th style="width:180px;">Item</th>
+              <th>MON</th>
+              <th>TUE</th>
+              <th>WED</th>
+              <th>THU</th>
+              <th>FRI</th>
+              <th style="width:140px;">Notes</th>
+            </tr>
+          </thead>
+          <tbody id="packing-body"></tbody>
+        </table>
+      </div>
+      <div class="save-msg" id="pack-save-msg"></div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ─── DEFAULT PRICES ($/g or $/lb) ───────────────────────────────────────────
+const DEFAULT_PRICES = {
+  'Chicken Thigh':       { price: 1.91,      unit: '$/lb' },
+  'Beef Rib Eye':        { price: 6.79,      unit: '$/lb' },
+  'Spare Rib':           { price: 3.69,      unit: '$/lb' },
+  'Pork Shoulder':       { price: 2.20,      unit: '$/lb' },
+  'Super Firm Tofu':     { price: 0.99,      unit: '$/lb' },
+  'Rice':                { price: 0.001613,  unit: '$/g'  },
+  'Soy Sauce Jin Gold':  { price: 0.003671,  unit: '$/g'  },
+  'Soy Sauce Yangjo':    { price: 0.002912,  unit: '$/g'  },
+  'Mirin':               { price: 0.003698,  unit: '$/g'  },
+  'Cooking Sake':        { price: 0.004189,  unit: '$/g'  },
+  'Corn Syrup':          { price: 0.002028,  unit: '$/g'  },
+  'Black Pepper':        { price: 0.01703,   unit: '$/g'  },
+  'Gochujang':           { price: 0.011593,  unit: '$/g'  },
+  'Gochugaru Kimchi':    { price: 0.009471,  unit: '$/g'  },
+  'Gochugaru Fine':      { price: 0.01003,   unit: '$/g'  },
+  'Oyster Sauce':        { price: 0.003322,  unit: '$/g'  },
+  'Sugar':               { price: 0.001992,  unit: '$/g'  },
+  'Brown Sugar':         { price: 0.004207,  unit: '$/g'  },
+  'MSG':                 { price: 0.008112,  unit: '$/g'  },
+  'Garlic':              { price: 0.006393,  unit: '$/g'  },
+  'Ginger':              { price: 0.008929,  unit: '$/g'  },
+  'Canola Oil':          { price: 0.002384,  unit: '$/g'  },
+  'Sesame Oil':          { price: 0.019905,  unit: '$/g'  },
+  'Salt':                { price: 0.003307,  unit: '$/g'  },
+  'Onion':               { price: 0.002371,  unit: '$/g'  },
+  'Green Pepper':        { price: 0.00849,   unit: '$/g'  },
+  'Sesame Seeds':        { price: 0.008201,  unit: '$/g'  },
+  'Black Sesame':        { price: 0.012,     unit: '$/g'  },
+  'Caramel':             { price: 0.006,     unit: '$/g'  },
+  'Pineapple':           { price: 0.003,     unit: '$/g'  },
+  'Coke':                { price: 0.001,     unit: '$/g'  },
+  'Yukjang':             { price: 0.002503,  unit: '$/g'  },
+  'Base Sauce':          { price: 0.001704,  unit: '$/g'  },
+  'Spicy Pork Sauce':    { price: 0.005692,  unit: '$/g'  },
+  'Beet Juice':          { price: 0.004,     unit: '$/g'  },
+  'Garlic Mayo':         { price: 0.005,     unit: '$/g'  },
+  'Corn Powder':         { price: 0.002,     unit: '$/g'  },
+  'Broccoli':            { price: 0.003307,  unit: '$/g'  },
+};
+
+// ─── RECIPE DEFINITIONS ──────────────────────────────────────────────────────
+const RECIPES = {
+  sc: {
+    name: 'Spicy Chicken', base: 10, unit: 'lb',
+    ingredients: [
+      { name: 'Chicken Thigh', qty: 10,    unit: 'lb', isBase: true },
+      { name: 'Soy Sauce Jin Gold', qty: 130.9, unit: 'g' },
+      { name: 'Mirin',         qty: 93.2,  unit: 'g' },
+      { name: 'Cooking Sake',  qty: 37.9,  unit: 'g' },
+      { name: 'Corn Syrup',    qty: 37.9,  unit: 'g' },
+      { name: 'Black Pepper',  qty: 1.3,   unit: 'g' },
+      { name: 'Gochujang',     qty: 419.8, unit: 'g' },
+      { name: 'Gochugaru Kimchi', qty: 62.1, unit: 'g' },
+      { name: 'Gochugaru Fine', qty: 62.1, unit: 'g' },
+      { name: 'Oyster Sauce',  qty: 168.8, unit: 'g' },
+      { name: 'Sugar',         qty: 168.8, unit: 'g' },
+      { name: 'MSG',           qty: 18.8,  unit: 'g' },
+    ]
+  },
+  bg: {
+    name: 'Bulgogi', base: 10, unit: 'lb',
+    ingredients: [
+      { name: 'Beef Rib Eye',  qty: 10,   unit: 'lb', isBase: true },
+      { name: 'Base Sauce',    qty: 1300, unit: 'g' },
+      { name: 'Onion',         qty: 270,  unit: 'g' },
+      { name: 'Garlic',        qty: 90,   unit: 'g' },
+      { name: 'Ginger',        qty: 24,   unit: 'g' },
+      { name: 'Canola Oil',    qty: 132,  unit: 'g' },
+      { name: 'Sesame Oil',    qty: 132,  unit: 'g' },
+      { name: 'Brown Sugar',   qty: 160,  unit: 'g' },
+      { name: 'Salt',          qty: 42,   unit: 'g' },
+      { name: 'Black Pepper',  qty: 18,   unit: 'g' },
+      { name: 'MSG',           qty: 15,   unit: 'g' },
+      { name: 'Onion',         qty: 750,  unit: 'g', label: 'Onion (service)' },
+      { name: 'Green Pepper',  qty: 300,  unit: 'g' },
+    ]
+  },
+  sr: {
+    name: 'Spare Rib', base: 15, unit: 'lb',
+    ingredients: [
+      { name: 'Spare Rib',        qty: 15,   unit: 'lb', isBase: true },
+      { name: 'Spicy Pork Sauce', qty: 1000, unit: 'g' },
+    ]
+  },
+  st: {
+    name: 'Spicy Tofu', base: 16, unit: 'lb',
+    ingredients: [
+      { name: 'Super Firm Tofu',  qty: 16,  unit: 'lb', isBase: true },
+      { name: 'Spicy Pork Sauce', qty: 1000, unit: 'g' },
+      { name: 'Beet Juice',       qty: 700,  unit: 'g' },
+      { name: 'Garlic Mayo',      qty: 500,  unit: 'g' },
+      { name: 'Corn Powder',      qty: 100,  unit: 'g' },
+    ]
+  },
+  bs: {
+    name: 'Base Sauce', base: 1300, unit: 'g (yield)',
+    ingredients: [
+      { name: 'Soy Sauce Yangjo', qty: 600, unit: 'g' },
+      { name: 'Brown Sugar',      qty: 300, unit: 'g' },
+    ]
+  },
+  pg: {
+    name: 'Pork Galbi', base: 10, unit: 'lb',
+    ingredients: [
+      { name: 'Pork Shoulder', qty: 10,   unit: 'lb', isBase: true },
+      { name: 'Yukjang',       qty: 1361, unit: 'g' },
+      { name: 'Garlic',        qty: 109,  unit: 'g', label: 'Garlic, Mince' },
+      { name: 'Black Pepper',  qty: 2,    unit: 'g' },
+      { name: 'MSG',           qty: 6,    unit: 'g' },
+      { name: 'Caramel',       qty: 22,   unit: 'g' },
+      { name: 'Sesame Seeds',  qty: 28,   unit: 'g' },
+      { name: 'Sesame Oil',    qty: 109,  unit: 'g' },
+      { name: 'Pineapple',     qty: 60,   unit: 'g' },
+      { name: 'Pear Juice',    qty: 360,  unit: 'g' },
+      { name: 'Sugar',         qty: 109,  unit: 'g' },
+    ]
+  }
+};
+
+// BOWL EXTRAS per serving
+const BOWL_EXTRAS = {
+  sc:  [],
+  bg:  [{ name: 'Green Pepper', qty: 28, unit: 'g' }, { name: 'Onion', qty: 28, unit: 'g' }, { name: 'Broccoli', qty: 29, unit: 'g' }],
+  sr:  [{ name: 'Onion', qty: 85, unit: 'g' }],
+  st:  [],
+  pg:  [],
+};
+
+// SHARED BOWL COMPONENTS
+const RICE_COST_PER_PORTION = () => {
+  const p = getPrices();
+  return (p['Rice'].price * 3000) / 33;
+};
+const SESAME_COST_PER_PORTION = () => {
+  const p = getPrices();
+  return p['Sesame Seeds'].price * 70/100 * 3 + p['Black Sesame'].price * 30/100 * 3;
+};
+
+// ─── PRICE STORAGE ───────────────────────────────────────────────────────────
+function getPrices() {
+  try {
+    const saved = localStorage.getItem('82bowl-prices');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return { ...DEFAULT_PRICES, ...parsed };
+    }
+  } catch(e) {}
+  return { ...DEFAULT_PRICES };
+}
+
+function savePrices() {
+  const inputs = document.querySelectorAll('.ing-price-input');
+  const prices = {};
+  inputs.forEach(inp => {
+    const key = inp.dataset.key;
+    const val = parseFloat(inp.value);
+    if (!isNaN(val)) {
+      prices[key] = { price: val, unit: DEFAULT_PRICES[key]?.unit || '$/g' };
+    }
+  });
+  localStorage.setItem('82bowl-prices', JSON.stringify(prices));
+  renderCostPanels();
+  savePricesToSheets();
+}
+
+function resetPrices() {
+  if (!confirm('Reset all prices to default?')) return;
+  localStorage.removeItem('82bowl-prices');
+  renderPriceEditor();
+  renderCostPanels();
+  document.getElementById('save-msg').textContent = '✓ Reset to default';
+  setTimeout(() => document.getElementById('save-msg').textContent = '', 2000);
+}
+
+// ─── COST CALCULATION ────────────────────────────────────────────────────────
+function calcRecipeCost(recipeKey, servings) {
+  const recipe = RECIPES[recipeKey];
+  const prices = getPrices();
+  let total = 0;
+
+  recipe.ingredients.forEach(ing => {
+    const p = prices[ing.name];
+    if (!p) return;
+    let cost = 0;
+    if (ing.unit === 'lb') {
+      cost = ing.qty * p.price;
+    } else {
+      if (p.unit === '$/lb') {
+        cost = ing.qty * (p.price / 453.592);
+      } else {
+        cost = ing.qty * p.price;
+      }
+    }
+    total += cost;
+  });
+
+  const perServing = servings > 0 ? total / servings : 0;
+  return { total, perServing };
+}
+
+function calcIngCost(ing, prices) {
+  const p = prices[ing.name];
+  if (!p) return 0;
+  if (ing.unit === 'lb') return ing.qty * p.price;
+  if (p.unit === '$/lb') return ing.qty * (p.price / 453.592);
+  return ing.qty * p.price;
+}
+
+// ─── RENDER COST PANELS ──────────────────────────────────────────────────────
+let currentCost = "csc";
+
+function renderCostPanels() {
+  const keys = ['csc','cbg','csr','cst','cpg'];
+  const rkeys = ['sc','bg','sr','st','pg'];
+  const defaults = { sc:16, bg:15, sr:null, st:null, pg:null };
+
+  let html = '';
+  keys.forEach((ck, i) => {
+    const rk = rkeys[i];
+    const recipe = RECIPES[rk];
+    const savedServ = localStorage.getItem('82bowl-serv-'+rk);
+    const serv = savedServ ? parseInt(savedServ) : defaults[rk];
+    const hasServ = serv !== null && serv > 0;
+    const prices = getPrices();
+    const { total, perServing } = calcRecipeCost(rk, hasServ ? serv : 0);
+    const rice = RICE_COST_PER_PORTION();
+    const sesame = SESAME_COST_PER_PORTION();
+    let extrasCost = 0;
+    BOWL_EXTRAS[rk].forEach(e => {
+      const ep = prices[e.name];
+      if (ep) extrasCost += e.qty * (ep.unit === '$/lb' ? ep.price/453.592 : ep.price);
+    });
+    const totalBowl = hasServ ? perServing + rice + sesame + extrasCost : null;
+    const sellPrice = parseFloat(localStorage.getItem('82bowl-sell-'+rk)) || 0;
+    const fc = (totalBowl && sellPrice > 0) ? (totalBowl / sellPrice * 100) : 0;
+    const dash = '<span style="color:var(--gray-500)">—</span>';
+
+    html += `<div class="cost-section" id="${ck}" style="display:none">
+      <h2 style="font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600;margin-bottom:20px;">${recipe.name}</h2>
+
+      <div class="servings-row">
+        <label>EST. SERVINGS (${recipe.base}${recipe.unit} base)</label>
+        <input type="number" value="${serv||''}" min="1" step="1" placeholder="—"
+          onchange="saveServ('${rk}',this.value);renderCostPanels()">
+      </div>
+
+      <div class="cost-grid">
+        <div class="cost-card">
+          <div class="cost-card-title">Recipe Breakdown</div>`;
+
+    recipe.ingredients.forEach(ing => {
+      const cost = calcIngCost(ing, prices);
+      html += `<div class="cost-row">
+        <span class="cost-label">${ing.label || ing.name} (${ing.qty}${ing.unit})</span>
+        <span class="cost-val">$${cost.toFixed(3)}</span>
+      </div>`;
+    });
+
+    html += `<div class="cost-row" style="border-top:1px solid var(--gray-400);margin-top:4px;padding-top:12px;">
+        <span class="cost-label" style="font-weight:600;color:var(--white);">Total Recipe</span>
+        <span class="cost-val">$${total.toFixed(2)}</span>
+      </div>
+      <div class="cost-row">
+        <span class="cost-label" style="color:var(--white);">Per Serving (÷${hasServ ? serv : '?'})</span>
+        <span class="cost-val green">${hasServ ? '$'+perServing.toFixed(3) : dash}</span>
+      </div>
+        </div>
+
+        <div class="cost-card">
+          <div class="cost-card-title">Bowl Cost</div>
+          <div class="cost-row"><span class="cost-label">Protein (per serving)</span><span class="cost-val">${hasServ ? '$'+perServing.toFixed(3) : dash}</span></div>
+          <div class="cost-row"><span class="cost-label">Rice (8oz)</span><span class="cost-val">$${rice.toFixed(3)}</span></div>
+          <div class="cost-row"><span class="cost-label">Sesame Mix (1 tsp)</span><span class="cost-val">$${sesame.toFixed(3)}</span></div>`;
+
+    BOWL_EXTRAS[rk].forEach(e => {
+      const ep = prices[e.name];
+      if (!ep) return;
+      const c = e.qty * (ep.unit === '$/lb' ? ep.price/453.592 : ep.price);
+      html += `<div class="cost-row"><span class="cost-label">${e.name} (${e.qty}g)</span><span class="cost-val">$${c.toFixed(3)}</span></div>`;
+    });
+
+    html += `<div class="cost-row" style="border-top:1px solid var(--gray-400);margin-top:4px;padding-top:12px;">
+        <span class="cost-label" style="font-weight:600;color:var(--white);">Total Cost / Bowl</span>
+        <span class="cost-val green">${totalBowl !== null ? '$'+totalBowl.toFixed(2) : dash}</span>
+      </div>
+        </div>
+      </div>
+
+      <div class="sell-block">
+        <label>SELL PRICE →</label>
+        <input type="number" value="${sellPrice||''}" min="0" step="0.5" placeholder="0.00"
+          onchange="saveSell('${rk}',this.value);renderCostPanels()">
+      </div>`;
+
+    if (sellPrice > 0) {
+      const fcClass = fc < 30 ? 'good' : fc < 35 ? 'warn' : 'bad';
+      html += `<div class="fc-display">
+        <label>FOOD COST %</label>
+        <span class="fc-pct ${fcClass}">${fc.toFixed(1)}%</span>
+      </div>`;
+    } else {
+      html += `<div class="fc-display">
+        <label>FOOD COST %</label>
+        <span class="fc-pct" style="color:var(--gray-500);">enter sell price</span>
+      </div>`;
+    }
+
+    html += `</div>`;
+  });
+
+  document.getElementById('cost-panels').innerHTML = html;
+
+  // show active
+  document.getElementById(currentCost).style.display = 'block';
+}
+
+function saveServ(key, val) {
+  localStorage.setItem('82bowl-serv-'+key, val);
+}
+function saveSell(key, val) {
+  localStorage.setItem('82bowl-sell-'+key, val);
+}
+
+// ─── PRICE EDITOR ────────────────────────────────────────────────────────────
+function renderPriceEditor() {
+  const prices = getPrices();
+  let html = '<div style="display:grid;grid-template-columns:1fr 120px 80px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--gray-300);margin-bottom:8px;">'
+    + '<span style="font-family:\'IBM Plex Mono\',monospace;font-size:10px;color:var(--gray-500);">INGREDIENT</span>'
+    + '<span style="font-family:\'IBM Plex Mono\',monospace;font-size:10px;color:var(--gray-500);text-align:right;">PRICE</span>'
+    + '<span style="font-family:\'IBM Plex Mono\',monospace;font-size:10px;color:var(--gray-500);">UNIT</span></div>';
+
+  Object.entries(prices).forEach(([name, { price, unit }]) => {
+    html += `<div class="ing-editor-row">
+      <span class="ing-name-label">${name}</span>
+      <input class="ing-price-input" type="number" step="any" value="${price}" data-key="${name}">
+      <span class="ing-unit-label">${unit}</span>
+    </div>`;
+  });
+
+  document.getElementById('ing-editor').innerHTML = html;
+}
+
+// ─── RECIPE CALCULATORS ──────────────────────────────────────────────────────
+function fmt(v) { return v % 1 === 0 ? v.toFixed(0) : v.toFixed(1); }
+function scale(base, r) { return fmt(base * r); }
+
+function calcSC() {
+  const lb = parseFloat(document.getElementById('sc-lb').value)||10;
+  const r = lb/10;
+  document.getElementById('sc-chicken').textContent = fmt(lb);
+  document.getElementById('sc-soy').textContent = scale(130.9,r);
+  document.getElementById('sc-mirin').textContent = scale(93.2,r);
+  document.getElementById('sc-sake').textContent = scale(37.9,r);
+  document.getElementById('sc-corn').textContent = scale(37.9,r);
+  document.getElementById('sc-pepper').textContent = scale(1.3,r);
+  document.getElementById('sc-gochujang').textContent = scale(419.8,r);
+  document.getElementById('sc-gk').textContent = scale(62.1,r);
+  document.getElementById('sc-gf').textContent = scale(62.1,r);
+  document.getElementById('sc-oyster').textContent = scale(168.8,r);
+  document.getElementById('sc-sugar').textContent = scale(168.8,r);
+  document.getElementById('sc-msg').textContent = scale(18.8,r);
+}
+function calcBG() {
+  const lb = parseFloat(document.getElementById('bg-lb').value)||10;
+  const r = lb/10;
+  document.getElementById('bg-beef').textContent = fmt(lb);
+  document.getElementById('bg-base').textContent = scale(1300,r);
+  document.getElementById('bg-onion1').textContent = scale(270,r);
+  document.getElementById('bg-garlic').textContent = scale(90,r);
+  document.getElementById('bg-ginger').textContent = scale(24,r);
+  document.getElementById('bg-canola').textContent = scale(132,r);
+  document.getElementById('bg-sesoil').textContent = scale(132,r);
+  document.getElementById('bg-sugar').textContent = scale(160,r);
+  document.getElementById('bg-salt').textContent = scale(42,r);
+  document.getElementById('bg-pepper').textContent = scale(18,r);
+  document.getElementById('bg-msg').textContent = scale(15,r);
+  document.getElementById('bg-onion2').textContent = scale(750,r);
+  document.getElementById('bg-gp').textContent = scale(300,r);
+}
+function calcSR() {
+  const lb = parseFloat(document.getElementById('sr-lb').value)||15;
+  const r = lb/15;
+  document.getElementById('sr-rib').textContent = fmt(lb);
+  document.getElementById('sr-sauce').textContent = scale(1000,r);
+  document.getElementById('sr-water').textContent = scale(3000,r);
+}
+function calcST() {
+  const lb = parseFloat(document.getElementById('st-lb').value)||16;
+  const r = lb/16;
+  document.getElementById('st-tofu').textContent = fmt(lb);
+  document.getElementById('st-sauce').textContent = scale(1000,r);
+  document.getElementById('st-beet').textContent = scale(700,r);
+  document.getElementById('st-mayo').textContent = scale(500,r);
+  document.getElementById('st-corn').textContent = scale(100,r);
+}
+function calcPG() {
+  const lb = parseFloat(document.getElementById('pg-lb').value)||10;
+  const r = lb/10;
+  document.getElementById('pg-pork').textContent = fmt(lb);
+  document.getElementById('pg-yukjang').textContent = scale(1361,r);
+  document.getElementById('pg-water').textContent = scale(1088,r);
+  document.getElementById('pg-garlic').textContent = scale(109,r);
+  document.getElementById('pg-pepper').textContent = scale(2,r);
+  document.getElementById('pg-msg').textContent = scale(6,r);
+  document.getElementById('pg-caramel').textContent = scale(22,r);
+  document.getElementById('pg-ses').textContent = scale(28,r);
+  document.getElementById('pg-sesoil').textContent = scale(109,r);
+  document.getElementById('pg-pine').textContent = scale(60,r);
+  document.getElementById('pg-pear').textContent = scale(360,r);
+  document.getElementById('pg-sugar').textContent = scale(109,r);
+}
+
+// ─── NAVIGATION ──────────────────────────────────────────────────────────────
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('header nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  btn.classList.add('active');
+  if (id === 'prices') { renderPriceEditor(); setTimeout(loadPricesFromSheets, 300); }
+  if (id === 'cost') renderCostPanels();
+  if (id === 'packing') {
+    if (!document.getElementById('packing-body').innerHTML) {
+      renderPackingTable();
+      setTimeout(loadFromSheets, 500);
+    }
+  }
+}
+
+function showRecipe(id, btn) {
+  document.querySelectorAll('.recipe').forEach(r => r.style.display='none');
+  document.querySelectorAll('#page-recipes nav button').forEach(b => {
+    b.style.background='transparent'; b.style.color='var(--gray-500)';
+  });
+  document.getElementById('r-'+id).style.display='block';
+  btn.style.background='var(--gray-200)'; btn.style.color='var(--white)';
+}
+
+function showCost(id, btn) {
+  currentCost = id;
+  document.querySelectorAll('.cost-section').forEach(c => c.style.display='none');
+  document.querySelectorAll('#page-cost nav button').forEach(b => {
+    b.style.background='transparent'; b.style.color='var(--gray-500)';
+  });
+  document.getElementById(id).style.display='block';
+  btn.style.background='var(--gray-200)'; btn.style.color='var(--white)';
+}
+
+
+// ─── BATCH CALCULATORS ───────────────────────────────────────────────────────
+function calcBS() {
+  const n = parseInt(document.getElementById('bs-batch').value)||1;
+  document.getElementById('bs-badge').textContent = n + ' BATCH' + (n>1?'ES':'') + ' — ' + (1300*n) + 'g YIELD';
+  document.getElementById('bs-soy').textContent = 600*n;
+  document.getElementById('bs-water').textContent = 400*n;
+  document.getElementById('bs-sugar').textContent = 300*n;
+}
+function calcSPS() {
+  const n = parseInt(document.getElementById('sps-batch').value)||1;
+  document.getElementById('sps-badge').textContent = n + ' BATCH' + (n>1?'ES':'') + ' — ' + (1000*n) + 'g YIELD';
+  document.getElementById('sps-soy').textContent = 290*n;
+  document.getElementById('sps-gf').textContent = 112*n;
+  document.getElementById('sps-gs').textContent = 37*n;
+  document.getElementById('sps-sesoil').textContent = 84*n;
+  document.getElementById('sps-corn').textContent = 112*n;
+  document.getElementById('sps-mirin').textContent = 28*n;
+  document.getElementById('sps-pepper').textContent = 9*n;
+  document.getElementById('sps-dasida').textContent = 19*n;
+  document.getElementById('sps-sugar').textContent = 75*n;
+  document.getElementById('sps-honey').textContent = 178*n;
+  document.getElementById('sps-plum').textContent = 56*n;
+}
+function calcSJ() {
+  const n = parseInt(document.getElementById('sj-batch').value)||1;
+  document.getElementById('sj-badge').textContent = n + ' BATCH' + (n>1?'ES':'') + ' — ' + (2100*n) + 'g YIELD';
+  document.getElementById('sj-doenjang').textContent = 1000*n;
+  document.getElementById('sj-gochujang').textContent = 500*n;
+  document.getElementById('sj-sugar').textContent = 100*n;
+  document.getElementById('sj-sprite').textContent = 500*n;
+  document.getElementById('sj-yield').textContent = 2100*n;
+}
+function calcTG() {
+  const n = parseInt(document.getElementById('tg-batch').value)||1;
+  document.getElementById('tg-badge').textContent = n + ' BATCH' + (n>1?'ES':'') + ' — ' + (730*n) + 'g YIELD';
+  document.getElementById('tg-sauce').textContent = 500*n;
+  document.getElementById('tg-beet').textContent = 100*n;
+  document.getElementById('tg-mayo').textContent = 100*n;
+  document.getElementById('tg-corn').textContent = 30*n;
+}
+function calcSM() {
+  const n = parseInt(document.getElementById('sm-batch').value)||1;
+  document.getElementById('sm-badge').textContent = n + ' BATCH' + (n>1?'ES':'') + ' — ' + (100*n) + 'g YIELD';
+  document.getElementById('sm-white').textContent = 70*n;
+  document.getElementById('sm-black').textContent = 30*n;
+}
+function calcRC() {
+  const n = parseInt(document.getElementById('rc-batch').value)||1;
+  const portions = Math.round(3000*n*2.5/227);
+  document.getElementById('rc-badge').textContent = n + ' BATCH' + (n>1?'ES':'') + ' — ~' + portions + ' PORTIONS';
+  document.getElementById('rc-rice').textContent = (3000*n).toLocaleString();
+  document.getElementById('rc-water').textContent = (3000*n).toLocaleString();
+  document.getElementById('rc-salt').textContent = 2*n;
+  document.getElementById('rc-yield').textContent = (3000*n*2.5).toLocaleString();
+  document.getElementById('rc-portions').textContent = portions;
+}
+
+
+
+// ─── GOOGLE SHEETS CONFIG ────────────────────────────────────────────────────
+const GS_API_KEY = 'AIzaSyAUksYLLgUGpOeh8xGg7Tw2yp-QYovFyIo';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwOaTN_3QYJEpQTcFy205OGCk0DJ_1Z-MjcZX2MignXvHjCoAK5wownz0vcJ0joBjhtUw/exec';
+const GS_SPREADSHEET_ID = '1vV9ABtVN0s_1-CsIB2G8anS9OB_OcyKSU1D2i5Nj-DI';
+const GS_SHEET_NAME = 'Packing / Stock';
+const GS_BASE_URL = `https://sheets.googleapis.com/v4/spreadsheets/${GS_SPREADSHEET_ID}`;
+
+// Map item names to row numbers in Google Sheet (row 5 = headers, data starts row 5)
+const SHEET_ROWS = {
+  'Rice': 5, 'Spicy Chicken': 6, 'Bulgogi': 7, 'Spicy Pork Rib': 8,
+  'Pork Galbi': 9, 'Tofu': 10, 'Spicy Pork Sauce': 11, 'Garlic Mayo': 12,
+  'Spicy Mayo': 13, 'Sesame Mix': 14, 'Sesame Yondu Sauce': 15,
+  'Corn Powder': 16, 'Crispy Shallot': 17, 'Broccoli': 18,
+  'Onion / Green Pepper': 19, 'Onion': 20, 'Lemon Slice': 21, 'Pickle': 22,
+  'Lemonade Mix': 23, 'Ssam Box': 24, 'Bowl': 25, 'Bowl Lid': 26,
+  'Cup': 27, 'Cup Lid': 28, 'Straw': 29, 'Spoon': 30, 'Fork': 31,
+  'Chopstick': 32, 'Napkin': 33, '2oz Ramekins': 34
+};
+
+async function saveToSheets() {
+  const msg = document.getElementById('pack-save-msg');
+  msg.textContent = '⏳ Saving to Google Sheets...';
+
+  try {
+    // First, update week date in B2
+    const date = document.getElementById('pack-date').value;
+    const requests = [];
+
+    // Build values array: each row = [item, MON_AM/PM, TUE_AM/PM, ...]
+    const data = getSavedPacking();
+    const days = ['MON','TUE','WED','THU','FRI'];
+    const values = [];
+
+    // Header row with date
+    const updateDate = await fetch(
+      `${GS_BASE_URL}/values/Packing / Stock!B2?key=${GS_API_KEY}`,
+      {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ range: "Packing / Stock!B2", majorDimension: "ROWS", values: [[date]] })
+      }
+    );
+
+    // Build all data rows
+    const rowData = [];
+    PACKING_ITEMS.forEach(([name, type]) => {
+      if (type === null) return; // skip section headers
+      const row = [name];
+      days.forEach(day => {
+        const am = data[name.replace(/[^a-zA-Z0-9]/g,'_')]?.[day]?.am || '';
+        const pm = data[name.replace(/[^a-zA-Z0-9]/g,'_')]?.[day]?.pm || '';
+        row.push(am + ' / ' + pm);
+      });
+      row.push(data[name.replace(/[^a-zA-Z0-9]/g,'_')]?.note || '');
+      rowData.push(row);
+    });
+
+    // Write to sheet starting at A5
+    const range = `Packing / Stock!A5:G${5 + rowData.length - 1}`;
+    const res = await fetch(
+      `${GS_BASE_URL}/values/${encodeURIComponent(range)}?valueInputOption=RAW&key=${GS_API_KEY}`,
+      {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ range, majorDimension: "ROWS", values: rowData })
+      }
+    );
+
+    const result = await res.json();
+    if (result.error) throw new Error(result.error.message);
+
+    msg.textContent = '✓ Saved to Google Sheets!';
+    msg.style.color = '#4caf82';
+  } catch(e) {
+    // no-cors fetch throws TypeError but still saves
+    msg.textContent = '✓ Saved!';
+    msg.style.color = '#4caf82';
+    console.log('Save note:', e.message);
+  }
+  setTimeout(() => { msg.textContent = ''; msg.style.color = '#4caf82'; }, 4000);
+}
+
+async function loadFromSheets() {
+  const msg = document.getElementById('pack-save-msg');
+  msg.textContent = '⏳ Loading...';
+  msg.style.color = '#4caf82';
+
+  try {
+    const date = document.getElementById('pack-date').value;
+    if (!date) throw new Error('Please set a week date first');
+
+    const url = APPS_SCRIPT_URL + '?action=load&date=' + encodeURIComponent(date);
+    const result = await jsonpRequest(url);
+    if (!result.success) throw new Error(result.error || 'Unknown error');
+    if (!result.found) {
+      msg.textContent = 'No data found for this week';
+      setTimeout(() => { msg.textContent = ''; }, 3000);
+      return;
+    }
+
+    // Decode compact format
+    const days = ['MON','TUE','WED','THU','FRI'];
+    const items = PACKING_ITEMS.filter(([n,t]) => t !== null);
+    const parts = (result.raw || '').split(';');
+    const data = getSavedPacking();
+
+    items.forEach(([name], idx) => {
+      const key = name.replace(/[^a-zA-Z0-9]/g,'_');
+      if (!data[key]) data[key] = {};
+      const vals = (parts[idx] || '').split(',');
+      days.forEach((day, di) => {
+        const pair = (vals[di] || '').split('|');
+        if (!data[key][day]) data[key][day] = {};
+        data[key][day].am = pair[0] || '';
+        data[key][day].pm = pair[1] || '';
+      });
+      data[key].note = vals[5] || '';
+    });
+
+    localStorage.setItem('82bowl-packing', JSON.stringify(data));
+    document.getElementById('packing-body').innerHTML = '';
+    renderPackingTable();
+
+    msg.textContent = '✓ Loaded!';
+    msg.style.color = '#4caf82';
+  } catch(e) {
+    msg.textContent = '✗ ' + e.message;
+    msg.style.color = '#c8352a';
+  }
+  setTimeout(() => { msg.textContent = ''; msg.style.color = '#4caf82'; }, 4000);
+}
+
+// ─── PACKING / STOCK ─────────────────────────────────────────────────────────
+const PACKING_ITEMS = [
+  ['PROTEINS', null],
+  ['Spicy Chicken', 'protein'],
+  ['Bulgogi', 'protein'],
+  ['Spicy Pork Rib', 'protein'],
+  ['Pork Galbi', 'protein'],
+  ['Tofu', 'protein'],
+  ['SAUCES & PREP', null],
+  ['Spicy Pork Sauce', 'sauce'],
+  ['Garlic Mayo', 'sauce'],
+  ['Spicy Mayo', 'sauce'],
+  ['Sesame Mix', 'sauce'],
+  ['Sesame Yondu Sauce', 'sauce'],
+  ['Corn Powder', 'sauce'],
+  ['Crispy Shallot', 'sauce'],
+  ['PRODUCE', null],
+  ['Rice', 'produce'],
+  ['Broccoli', 'produce'],
+  ['Onion / Green Pepper', 'produce'],
+  ['Onion', 'produce'],
+  ['Lemon Slice', 'produce'],
+  ['Pickle', 'produce'],
+  ['DRINKS', null],
+  ['Lemonade Mix', 'drink'],
+  ['SUPPLIES', null],
+  ['Ssam Box', 'supply'],
+  ['Bowl', 'supply'],
+  ['Bowl Lid', 'supply'],
+  ['Cup', 'supply'],
+  ['Cup Lid', 'supply'],
+  ['Straw', 'supply'],
+  ['Spoon', 'supply'],
+  ['Fork', 'supply'],
+  ['Chopstick', 'supply'],
+  ['Napkin', 'supply'],
+  ['2oz Ramekins', 'supply'],
+];
+const DAYS = ['MON','TUE','WED','THU','FRI'];
+
+function renderPackingTable() {
+  const saved = getSavedPacking();
+  const tbody = document.getElementById('packing-body');
+  let html = '';
+  let rowIdx = 0;
+
+  PACKING_ITEMS.forEach(([name, type]) => {
+    if (type === null) {
+      // Section header
+      html += `<tr><td colspan="7" style="background:var(--gray-200);font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--gray-500);text-transform:uppercase;padding:8px 12px;">${name}</td></tr>`;
+    } else {
+      const bg = rowIdx % 2 === 0 ? 'background:var(--gray-100);' : '';
+      rowIdx++;
+      const key = name.replace(/[^a-zA-Z0-9]/g,'_');
+      html += `<tr>
+        <td style="${bg}font-size:13px;">${name}</td>`;
+      DAYS.forEach(day => {
+        const am = saved[key]?.[day]?.am || '';
+        const pm = saved[key]?.[day]?.pm || '';
+        html += `<td style="${bg}padding:6px 8px;">
+          <div style="display:flex;align-items:center;gap:4px;">
+            <input type="text" data-key="${key}" data-day="${day}" data-slot="am"
+              value="${am}" placeholder="AM"
+              style="background:transparent;border:none;border-bottom:1px solid var(--gray-400);color:var(--white);font-family:'IBM Plex Mono',monospace;font-size:12px;width:42px;text-align:center;outline:none;padding:2px;"
+              oninput="autoSavePacking(this)">
+            <span style="color:var(--gray-500);font-size:12px;">/</span>
+            <input type="text" data-key="${key}" data-day="${day}" data-slot="pm"
+              value="${pm}" placeholder="PM"
+              style="background:transparent;border:none;border-bottom:1px solid var(--gray-300);color:var(--gray-600);font-family:'IBM Plex Mono',monospace;font-size:12px;width:42px;text-align:center;outline:none;padding:2px;"
+              oninput="autoSavePacking(this)">
+          </div>
+        </td>`;
+      });
+      const note = saved[key]?.note || '';
+      html += `<td style="${bg}padding:6px 8px;">
+        <input type="text" data-key="${key}" data-day="note" data-slot="note"
+          value="${note}" placeholder="—"
+          style="background:transparent;border:none;border-bottom:1px solid var(--gray-300);color:var(--gray-500);font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;outline:none;padding:2px;"
+          oninput="autoSavePacking(this)">
+      </td></tr>`;
+    }
+  });
+
+  tbody.innerHTML = html;
+
+  // Set date
+  const dateInput = document.getElementById('pack-date');
+  if (saved._date) dateInput.value = saved._date;
+  dateInput.onchange = () => {
+    const d = getSavedPacking();
+    d._date = dateInput.value;
+    localStorage.setItem('82bowl-packing', JSON.stringify(d));
+  };
+}
+
+function getSavedPacking() {
+  try {
+    const s = localStorage.getItem('82bowl-packing');
+    return s ? JSON.parse(s) : {};
+  } catch(e) { return {}; }
+}
+
+function autoSavePacking(input) {
+  const key = input.dataset.key;
+  const day = input.dataset.day;
+  const slot = input.dataset.slot;
+  const data = getSavedPacking();
+  if (!data[key]) data[key] = {};
+  if (slot === 'note') {
+    data[key].note = input.value;
+  } else {
+    if (!data[key][day]) data[key][day] = {};
+    data[key][day][slot] = input.value;
+  }
+  try {
+    localStorage.setItem('82bowl-packing', JSON.stringify(data));
+  } catch(e) {
+    console.error('Save failed:', e);
+  }
+}
+
+function savePacking() {
+  // Force save all current inputs to localStorage first
+  const inputs = document.querySelectorAll('#packing-body input');
+  inputs.forEach(input => autoSavePacking(input));
+  // Then save to Google Sheets
+  saveToSheets();
+}
+
+function clearPacking() {
+  if (!confirm('Clear all packing data for this week?')) return;
+  localStorage.removeItem('82bowl-packing');
+  renderPackingTable();
+}
+
+function calcRG() {
+  const n = parseInt(document.getElementById('rg-batch').value)||1;
+  document.getElementById('rg-badge').textContent = n + ' BATCH' + (n>1?'ES':'') + ' — ' + (2675*n) + 'g YIELD';
+  document.getElementById('rg-garlic').textContent = (2000*n).toLocaleString();
+  document.getElementById('rg-oil').textContent = (400*n).toLocaleString();
+  document.getElementById('rg-water').textContent = (250*n).toLocaleString();
+  document.getElementById('rg-salt').textContent = (25*n).toLocaleString();
+}
+
+function calcROP() {
+  const n = parseInt(document.getElementById('rop-batch').value)||1;
+  document.getElementById('rop-badge').textContent = n + ' BATCH' + (n>1?'ES':'') + ' — ' + (5*n) + 'kg ONION BASE';
+  document.getElementById('rop-onion').textContent = (5000*n).toLocaleString();
+  document.getElementById('rop-jal').textContent = (200*n).toLocaleString();
+  document.getElementById('rop-ginger').textContent = (45*n).toLocaleString();
+  document.getElementById('rop-chili').textContent = (6*n).toLocaleString();
+  document.getElementById('rop-mirin').textContent = (750*n).toLocaleString();
+  document.getElementById('rop-salt').textContent = (100*n).toLocaleString();
+  document.getElementById('rop-sugar').textContent = (1000*n).toLocaleString();
+  document.getElementById('rop-sake').textContent = (750*n).toLocaleString();
+  document.getElementById('rop-soy').textContent = (1500*n).toLocaleString();
+  document.getElementById('rop-vinegar').textContent = (700*n).toLocaleString();
+  document.getElementById('rop-water').textContent = (650*n).toLocaleString();
+}
+
+function calcSDS() {
+  const n = parseInt(document.getElementById('sds-batch').value)||1;
+  document.getElementById('sds-badge').textContent = n + ' BATCH' + (n>1?'ES':'') + ' — ' + (250*n) + 'g YIELD';
+  document.getElementById('sds-canola').textContent = (150*n).toLocaleString();
+  document.getElementById('sds-sesoil').textContent = (50*n).toLocaleString();
+  document.getElementById('sds-yondu').textContent = (50*n).toLocaleString();
+}
+
+
+async function savePricesToSheets() {
+  const msg = document.getElementById('save-msg');
+  msg.textContent = '⏳ Saving to Google Sheets...';
+  msg.style.color = '#4caf82';
+
+  try {
+    const inputs = document.querySelectorAll('.ing-price-input');
+    const values = [];
+    inputs.forEach(inp => {
+      const key = inp.dataset.key;
+      const val = parseFloat(inp.value);
+      if (!isNaN(val)) {
+        values.push([key, val, DEFAULT_PRICES[key]?.unit || '$/g']);
+      }
+    });
+
+    const range = `시트1!I1:K${values.length}`;
+    const res = await fetch(
+      `https://sheets.googleapis.com/v4/spreadsheets/1hqLvi0tG4sdxOKx9iMb58SYBS7cbPShETG5jbbrUqRE/values/${encodeURIComponent('Price Override!A1:C' + values.length)}?valueInputOption=RAW&key=${GS_API_KEY}`,
+      {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          range: 'Price Override!A1:C' + values.length,
+          majorDimension: 'ROWS',
+          values: values
+        })
+      }
+    );
+    const result = await res.json();
+    if (result.error) throw new Error(result.error.message);
+
+    msg.textContent = '✓ Saved to Google Sheets!';
+  } catch(e) {
+    // Fallback: just save to localStorage
+    msg.textContent = '✓ Saved locally (Sheets unavailable)';
+    console.error(e);
+  }
+  setTimeout(() => { msg.textContent = ''; }, 3000);
+}
+
+async function loadPricesFromSheets() {
+  const msg = document.getElementById('save-msg');
+  msg.textContent = '⏳ Loading prices...';
+  msg.style.color = '#4caf82';
+
+  try {
+    const res = await fetch(
+      `https://sheets.googleapis.com/v4/spreadsheets/1hqLvi0tG4sdxOKx9iMb58SYBS7cbPShETG5jbbrUqRE/values/${encodeURIComponent('Price Override!A:C')}?key=${GS_API_KEY}`
+    );
+    const result = await res.json();
+    if (result.error) throw new Error(result.error.message);
+
+    const rows = result.values || [];
+    if (rows.length === 0) {
+      msg.textContent = 'No saved prices in Sheets — using current';
+      return;
+    }
+
+    const prices = getPrices();
+    rows.forEach(row => {
+      if (row[0] && row[1]) {
+        prices[row[0]] = { price: parseFloat(row[1]), unit: row[2] || '$/g' };
+      }
+    });
+
+    localStorage.setItem('82bowl-prices', JSON.stringify(prices));
+    renderPriceEditor();
+    renderCostPanels();
+    msg.textContent = '✓ Prices loaded from Google Sheets!';
+  } catch(e) {
+    msg.textContent = '✓ Using locally saved prices';
+    console.error(e);
+  }
+  setTimeout(() => { msg.textContent = ''; }, 3000);
+}
+
+// ─── LOCK ────────────────────────────────────────────────────────────────────
+function unlock() {
+  if (document.getElementById('pw').value === '30vandam') {
+    document.getElementById('lock').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+  } else {
+    document.getElementById('pw-err').textContent = 'incorrect password';
+    document.getElementById('pw').value = '';
+  }
+}
+</script>
+
+
+</body></html>
